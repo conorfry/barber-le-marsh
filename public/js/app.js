@@ -2,7 +2,7 @@ const MONTHS = [
   'January','February','March','April','May','June',
   'July','August','September','October','November','December'
 ];
-const OPEN_DAYS = [0, 3, 4, 5, 6]; // Sun, Wed, Thu, Fri, Sat
+const OPEN_DAYS = [2, 3, 4, 5, 6]; // Tue, Wed, Thu, Fri, Sat
 
 let services = [];
 
@@ -205,7 +205,6 @@ function renderSummary() {
     <div class="sum-row"><span class="lbl">Service</span><span class="val">${state.service.name}</span></div>
     <div class="sum-row"><span class="lbl">Date</span><span class="val">${dateStr}</span></div>
     <div class="sum-row"><span class="lbl">Time</span><span class="val">${fmtTime(state.time)}</span></div>
-    <div class="sum-row"><span class="lbl">Barber</span><span class="val">Conor</span></div>
     <div class="sum-sep"></div>
     <div class="sum-row sum-total">
       <span class="lbl">Price</span>
@@ -260,7 +259,6 @@ function showConfirmation(b) {
     <div class="conf-row"><span class="lbl">Service</span><span>${b.serviceName}</span></div>
     <div class="conf-row"><span class="lbl">Date</span><span>${dateStr}</span></div>
     <div class="conf-row"><span class="lbl">Time</span><span>${fmtTime(b.time)}</span></div>
-    <div class="conf-row"><span class="lbl">Barber</span><span>Conor</span></div>
     <div class="conf-row"><span class="lbl">Name</span><span>${b.name}</span></div>
     <div class="conf-row"><span class="lbl">Pay</span><span>£${b.price.toFixed(2)} in store</span></div>
   `;

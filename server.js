@@ -26,11 +26,11 @@ const SERVICES = [
 
 // Keyed by JS day-of-week (0=Sun). Days absent = closed.
 const OPENING_HOURS = {
-  0: { open: '10:00', close: '15:00' }, // Sunday
+  2: { open: '10:00', close: '18:00' }, // Tuesday
   3: { open: '10:00', close: '18:00' }, // Wednesday
   4: { open: '10:00', close: '18:00' }, // Thursday
   5: { open: '10:00', close: '18:00' }, // Friday
-  6: { open: '10:00', close: '18:00' }, // Saturday
+  6: { open: '10:00', close: '15:00' }, // Saturday
 };
 
 function toMins(t) {
