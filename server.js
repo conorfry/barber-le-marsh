@@ -14,11 +14,14 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 const SERVICES = [
-  { id: 'beard-trim',        name: 'Beard Trim',        price: 6.00,  duration: 30 },
-  { id: 'kids',              name: 'Kids',               price: 14.00, duration: 30 },
-  { id: 'oap',               name: 'OAP',                price: 12.00, duration: 30 },
-  { id: 'short-back-sides',  name: 'Short Back & Sides', price: 15.00, duration: 45 },
-  { id: 'skin-fade',         name: 'Skin Fade',          price: 17.00, duration: 60 },
+  { id: 'skin-fade',          name: 'Skin Fade',          price: 17.00, duration: 30, description: 'Low/mid/high skin fade on the sides, scissors on top.' },
+  { id: 'taper',              name: 'Taper',              price: 17.00, duration: 30, description: 'Low/mid/high taper on the back & sides, scissors on top.' },
+  { id: 'standard-haircut',   name: 'Standard Haircut',   price: 15.00, duration: 25, description: 'Single grade on the back and sides, cut on top.' },
+  { id: 'flowcut',            name: 'Flowcut',            price: 17.00, duration: 35, description: "Long/medium length scissor cut for those with texture and 'flow'." },
+  { id: 'kids-cut',           name: 'Kids Cut',           price: 15.00, duration: 25, description: 'Any haircut for those aged ≤12.' },
+  { id: 'oap',                name: 'OAP (67+)',          price: 12.00, duration: 20, description: 'Any haircut for those aged 67+.' },
+  { id: 'beard-trim',         name: 'Beard Trim',         price: 7.00,  duration: 10, description: 'Any beard trim with clippers.' },
+  { id: 'beard-trim-razor',   name: 'Beard Trim + Razor', price: 8.00,  duration: 15, description: "Any beard trim with a razored 'line-up'." },
 ];
 
 // Keyed by JS day-of-week (0=Sun). Days absent = closed.

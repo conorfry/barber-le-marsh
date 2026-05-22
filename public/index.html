@@ -6,7 +6,7 @@
   <title>Barber Le Marsh — Traditional English Barbershop</title>
   <meta name="description" content="Barber le Marsh — traditional English barbershop with Conor. Book your appointment online.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
@@ -14,13 +14,10 @@
 <!-- Navigation -->
 <nav class="nav" id="nav">
   <div class="nav-inner">
-    <a href="/" class="nav-brand">
-      <img src="/logo.png" alt="Barber le Marsh" class="nav-logo">
-    </a>
     <ul class="nav-links" id="nav-links">
       <li><a href="#services">Services</a></li>
       <li><a href="#hours">Hours</a></li>
-      <li><a href="https://www.fresha.com/book-now/barber-le-marsh-nvpetmhn/all-offer?share=true&pId=2889970" target="_blank" rel="noopener class="nav-cta">Book Now</a></li>
+      <li><a href="https://www.fresha.com/book-now/barber-le-marsh-nvpetmhn/all-offer?share=true&pId=2889970" target="_blank" rel="noopener" class="nav-cta">Book Now</a></li>
     </ul>
     <button class="nav-burger" id="nav-burger" aria-label="Open menu">
       <span></span><span></span><span></span>
@@ -43,7 +40,7 @@
       <p class="loading" style="border-top:1px solid var(--border);padding:24px 0">Loading…</p>
     </div>
     <div class="services-cta">
-      <a href="https://www.fresha.com/book-now/barber-le-marsh-nvpetmhn/all-offer?share=true&pId=2889970" target="_blank" rel="noopener class="btn btn-red">Book Your Appointment</a>
+      <a href="https://www.fresha.com/book-now/barber-le-marsh-nvpetmhn/all-offer?share=true&pId=2889970" target="_blank" rel="noopener" class="btn btn-red">Book Your Appointment</a>
     </div>
   </div>
 </section>
@@ -79,7 +76,7 @@
           <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:28px">
             <a href="https://maps.app.goo.gl/KYxmgyLJp97zuMnV7" target="_blank" rel="noopener"
                class="btn btn-ghost">Get Directions</a>
-            <a href="https://www.fresha.com/book-now/barber-le-marsh-nvpetmhn/all-offer?share=true&pId=2889970" target="_blank" rel="noopener class="btn btn-red">Book Online</a>
+            <a href="https://www.fresha.com/book-now/barber-le-marsh-nvpetmhn/all-offer?share=true&pId=2889970" target="_blank" rel="noopener" class="btn btn-red">Book Online</a>
           </div>
         </div>
       </div>
@@ -90,13 +87,7 @@
 <!-- Footer -->
 <footer class="footer">
   <div class="footer-inner">
-    <span class="footer-brand">Barber le Marsh</span>
-    <p class="footer-text">Traditional English Barbershop &nbsp;·&nbsp; Pay in Store</p>
-    <p class="footer-links">
-      <a href="https://www.fresha.com/book-now/barber-le-marsh-nvpetmhn/all-offer?share=true&pId=2889970" target="_blank" rel="noopener>Book</a>
-      <span class="footer-sep">·</span>
-      <a href="/admin.html">Admin</a>
-    </p>
+    <img src="/logo-footer.png" alt="Barber le Marsh" class="footer-logo">
   </div>
 </footer>
 
@@ -105,14 +96,27 @@
   fetch('/api/services')
     .then(r => r.json())
     .then(services => {
-      document.getElementById('services-menu').innerHTML = services.map(s => `
-        <div class="service-row">
-          <span class="service-row-name">${s.name}</span>
-          <span class="service-row-dots"></span>
-          <span class="service-row-dur">${s.duration} min</span>
-          <span class="service-row-price">£${s.price.toFixed(2)}</span>
-        </div>
-      `).join('');
+      const hair  = services.filter(s => !s.id.startsWith('beard'));
+      const beard = services.filter(s =>  s.id.startsWith('beard'));
+
+      const renderGroup = (title, items) => `
+        <p class="services-group-label">${title}</p>
+        ${items.map(s => `
+          <div class="service-row">
+            <div class="service-row-left">
+              <span class="service-row-name">${s.name}</span>
+              ${s.description ? `<span class="service-row-desc">${s.description}</span>` : ''}
+            </div>
+            <div class="service-row-right">
+              <span class="service-row-dur">${s.duration} min</span>
+              <span class="service-row-price">£${s.price.toFixed(2)}</span>
+            </div>
+          </div>
+        `).join('')}
+      `;
+
+      document.getElementById('services-menu').innerHTML =
+        renderGroup('Hair', hair) + renderGroup('Beard', beard);
     })
     .catch(() => {
       document.getElementById('services-menu').innerHTML = '';
