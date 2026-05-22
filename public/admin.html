@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Barber Le Marsh</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="admin-page">
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-brand">
+      <img src="/logo.png" alt="Barber le Marsh" class="nav-logo">
+    </a>
+    <ul class="nav-links">
+      <li><a href="/">&#8592; Back to site</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- Login -->
+<div id="login-screen">
+  <div class="admin-login">
+    <div class="login-box">
+      <div class="login-ornament">◆</div>
+      <h2 class="login-title">Admin Login</h2>
+      <p class="login-sub">Barber le Marsh · Bookings</p>
+      <div class="form-group" style="text-align:left">
+        <label for="pw-input">Password</label>
+        <input type="password" id="pw-input" placeholder="Enter password"
+               onkeydown="if(event.key==='Enter') login()">
+      </div>
+      <button class="btn btn-red" style="width:100%;padding:14px;margin-top:4px" onclick="login()">
+        Sign In
+      </button>
+      <p class="error-msg" id="login-err">Incorrect password — please try again.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Admin panel -->
+<div id="admin-screen" style="display:none">
+  <div class="admin-wrap">
+    <div class="admin-top">
+      <h2>Bookings</h2>
+      <div class="admin-controls">
+        <div class="view-toggle">
+          <button id="btn-day" class="active" onclick="setView('day')">Today</button>
+          <button id="btn-all" onclick="setView('all')">All</button>
+        </div>
+        <button class="logout-btn" onclick="logout()">Log out</button>
+      </div>
+    </div>
+
+    <div class="day-nav" id="day-nav">
+      <button onclick="changeDay(-1)">&#8592;</button>
+      <span id="date-display"></span>
+      <button onclick="changeDay(1)">&#8594;</button>
+    </div>
+
+    <div id="bookings-out"></div>
+  </div>
+</div>
+
+<script>
+  let pw = '';
+  let currentDate = new Date();
+  let view = 'day';
+
+  function login() {
+    pw = document.getElementById('pw-input').value;
+    loadBookings().then(ok => {
+      if (ok) {
+        document.getElementById('login-screen').style.display  = 'none';
+        document.getElementById('admin-screen').style.display  = '';
+        document.getElementById('login-err').style.display     = 'none';
+      } else {
+        document.getElementById('login-err').style.display = 'block';
+        pw = '';
+      }
+    });
+  }
+
+  function logout() {
+    pw = '';
+    document.getElementById('pw-input').value   = '';
+    document.getElementById('login-screen').style.display = '';
+    document.getElementById('admin-screen').style.display = 'none';
+  }
+
+  function setView(v) {
+    view = v;
+    document.getElementById('btn-day').classList.toggle('active', v === 'day');
+    document.getElementById('btn-all').classList.toggle('active', v === 'all');
+    document.getElementById('day-nav').style.display = v === 'day' ? 'flex' : 'none';
+    loadBookings();
+  }
+
+  function changeDay(delta) {
+    currentDate = new Date(currentDate);
+    currentDate.setDate(currentDate.getDate() + delta);
+    loadBookings();
+  }
+
+  function dateFmt(d) {
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+
+  function updateDateDisplay() {
+    const opts = { weekday:'long', day:'numeric', month:'long', year:'numeric' };
+    document.getElementById('date-display').textContent =
+      currentDate.toLocaleDateString('en-GB', opts);
+  }
+
+  async function loadBookings() {
+    updateDateDisplay();
+    const dateQ = view === 'day' ? `&date=${dateFmt(currentDate)}` : '';
+    try {
+      const res = await fetch(`/api/admin/bookings?password=${encodeURIComponent(pw)}${dateQ}`);
+      if (res.status === 401) return false;
+      const data = await res.json();
+      renderBookings(data);
+      return true;
+    } catch {
+      document.getElementById('bookings-out').innerHTML =
+        '<div class="empty-state">Failed to load — check the server is running.</div>';
+      return true;
+    }
+  }
+
+  function renderBookings(bookings) {
+    const out = document.getElementById('bookings-out');
+    if (!bookings.length) {
+      out.innerHTML = '<div class="empty-state">No bookings for this period.</div>';
+      return;
+    }
+    out.innerHTML = `
+      <table class="book-table">
+        <thead>
+          <tr>
+            <th>Time</th>
+            ${view === 'all' ? '<th>Date</th>' : ''}
+            <th>Name</th>
+            <th>Service</th>
+            <th>Phone</th>
+            <th>Ref</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${bookings.map(b => `
+            <tr id="row-${b.id}">
+              <td><strong>${fmtTime(b.time)}</strong></td>
+              ${view === 'all' ? `<td>${fmtDateShort(b.date)}</td>` : ''}
+              <td>${b.name}</td>
+              <td>${b.serviceName} <span class="price-tag">£${b.price.toFixed(2)}</span></td>
+              <td><a href="tel:${b.phone}" style="color:var(--red)">${b.phone}</a></td>
+              <td style="font-family:monospace;font-size:12px;color:var(--warm-grey)">${b.id.slice(0,8).toUpperCase()}</td>
+              <td>
+                <button class="btn-cancel" onclick="cancelBooking('${b.id}')">Cancel</button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  }
+
+  function fmtTime(t) {
+    const [h, m] = t.split(':').map(Number);
+    const p  = h >= 12 ? 'pm' : 'am';
+    const hr = h > 12 ? h - 12 : h === 0 ? 12 : h;
+    return `${hr}:${String(m).padStart(2,'0')}${p}`;
+  }
+
+  function fmtDateShort(d) {
+    return new Date(d + 'T12:00:00').toLocaleDateString('en-GB',
+      { weekday:'short', day:'numeric', month:'short' });
+  }
+
+  async function cancelBooking(id) {
+    if (!confirm('Cancel this booking? The customer will not be notified automatically.')) return;
+    const res = await fetch(
+      `/api/admin/bookings/${id}?password=${encodeURIComponent(pw)}`,
+      { method: 'DELETE' }
+    );
+    if (res.ok) loadBookings();
+    else alert('Failed to cancel booking.');
+  }
+
+  updateDateDisplay();
+</script>
+
+</body>
+</html>
