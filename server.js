@@ -14,12 +14,11 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 const SERVICES = [
-  { id: 'haircut',             name: 'Fade, Taper or Mullet', price: 17.00, duration: 30, description: 'Any of the above, with scissors on top.' },
-  { id: 'standard-haircut',   name: 'Simple Haircut',     price: 15.00, duration: 25, description: 'Single grade on the back and sides, cut on top.' },
-  { id: 'buzzcut',            name: 'Buzzcut',            price: 13.00, duration: 15, description: 'Single grade all over.' },
-  { id: 'flowcut',            name: 'Scissor Cut',        price: 17.00, duration: 35, description: "Long/medium length scissor cut for those with texture and 'flow'." },
-  { id: 'kids-cut',           name: 'Kids Cut',           price: 15.00, duration: 25, description: 'Any haircut for those aged ≤12.' },
-  { id: 'oap',                name: 'OAP (67+)',          price: 12.00, duration: 20, description: 'Any haircut for those aged 67+.' },
+  { id: 'oap',                name: 'OAP (67+)',              price: 15.00, duration: 25, description: '' },
+  { id: 'u16',                name: 'U16 Haircut',            price: 15.00, duration: 25, description: '' },
+  { id: 'back-and-sides',     name: 'Back & Sides',           price: 15.00, duration: 20, description: '' },
+  { id: 'standard-cut',       name: 'Standard Cut',           price: 16.00, duration: 25, description: 'Includes scissor work. Not suitable for mullets, fades, or long hairstyles.' },
+  { id: 'skinfade',           name: 'Skinfade (Full haircut)', price: 17.00, duration: 30, description: 'Suitable for anything below a 0.5 fade on the back & sides.' },
   { id: 'beard-trim',         name: 'Beard Trim',         price: 7.00,  duration: 10, description: 'Any beard trim with clippers.' },
   { id: 'beard-trim-razor',   name: 'Beard Trim + Razor', price: 8.00,  duration: 15, description: "Any beard trim with a razored 'line-up'." },
 ];
