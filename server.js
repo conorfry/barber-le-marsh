@@ -16,7 +16,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 const SERVICES = [
   { id: 'oap',                name: 'OAP (67+)',              price: 15.00, duration: 25, description: '' },
   { id: 'u16',                name: 'U16 Haircut',            price: 15.00, duration: 25, description: '' },
-  { id: 'back-and-sides',     name: 'Back & Sides',           price: 15.00, duration: 20, description: '' },
   { id: 'standard-cut',       name: 'Simple Haircut',         price: 15.00, duration: 25, description: '' },
   { id: 'skinfade',           name: 'Skinfade, Taper or Mullet', price: 17.00, duration: 30, description: 'Suitable for anything below a 0.5 fade on the back & sides.' },
   { id: 'beard-trim',         name: 'Beard Trim',         price: 7.00,  duration: 10, description: 'Any beard trim with clippers.' },
