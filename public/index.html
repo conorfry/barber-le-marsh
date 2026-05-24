@@ -128,8 +128,8 @@
   fetch('/api/services')
     .then(r => r.json())
     .then(services => {
-      const hair  = services.filter(s => !s.id.startsWith('beard'));
-      const beard = services.filter(s =>  s.id.startsWith('beard'));
+      const hair  = services.filter(s => !s.id.startsWith('beard')).sort((a, b) => a.price - b.price);
+      const beard = services.filter(s =>  s.id.startsWith('beard')).sort((a, b) => a.price - b.price);
 
       const renderGroup = (title, items) => `
         <p class="services-group-label">${title}</p>
