@@ -16,6 +16,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 const SERVICES = [
   { id: 'haircut',             name: 'Fade, Taper or Mullet', price: 17.00, duration: 30, description: 'Any of the above, with scissors on top.' },
   { id: 'standard-haircut',   name: 'Simple Haircut',     price: 15.00, duration: 25, description: 'Single grade on the back and sides, cut on top.' },
+  { id: 'buzzcut',            name: 'Buzzcut',            price: 13.00, duration: 15, description: 'Single grade all over.' },
   { id: 'flowcut',            name: 'Scissor Cut',        price: 17.00, duration: 35, description: "Long/medium length scissor cut for those with texture and 'flow'." },
   { id: 'kids-cut',           name: 'Kids Cut',           price: 15.00, duration: 25, description: 'Any haircut for those aged ≤12.' },
   { id: 'oap',                name: 'OAP (67+)',          price: 12.00, duration: 20, description: 'Any haircut for those aged 67+.' },
