@@ -14,12 +14,14 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 const SERVICES = [
-  { id: 'oap',                name: 'OAP (67+)',              price: 15.00, duration: 25, description: '' },
-  { id: 'u16',                name: 'U16 Haircut',            price: 15.00, duration: 25, description: '' },
-  { id: 'standard-cut',       name: 'Simple Haircut',         price: 15.00, duration: 25, description: '' },
-  { id: 'skinfade',           name: 'Skinfade, Taper or Mullet', price: 17.00, duration: 30, description: 'Suitable for anything below a 0.5 fade on the back & sides.' },
-  { id: 'beard-trim',         name: 'Beard Trim',         price: 7.00,  duration: 10, description: 'Any beard trim with clippers.' },
-  { id: 'beard-trim-razor',   name: 'Beard Trim + Razor', price: 8.00,  duration: 15, description: "Any beard trim with a razored 'line-up'." },
+  { id: 'bundle-style-beard',    name: 'Style Cut & Beard Trim +', price: 25.00, duration: 45, description: 'Any style cut with beard trim and hot towel razor line up on the neck and cheeks.' },
+  { id: 'bundle-simple-beard',   name: 'Simple Haircut & Beard',   price: 23.00, duration: 35, description: 'Any haircut & simple beard trim.' },
+  { id: 'single-length',         name: 'Single Length All Over',   price: 12.00, duration: 20, description: 'Single length all over including beard, neck & ears. For the follicularly challenged…. :)' },
+  { id: 'u16',                   name: '≤ U16 Haircut',            price: 15.00, duration: 25, description: 'Any haircut for those equal to or younger than 16 y/o.' },
+  { id: 'short-back-sides',      name: 'Short Back & Sides',       price: 15.00, duration: 20, description: 'Simple 1/2/3/4 back & sides with a trim on top.' },
+  { id: 'style-cut',             name: 'Style Cut',                price: 17.00, duration: 30, description: 'Suitable for skin fade, taper, mullet, flow cut, crop, buzz-fade, afro, scissor cut.' },
+  { id: 'beard-trim',            name: 'Beard Trim',               price: 6.00,  duration: 10, description: 'Any beard trim with just clippers/foiler.' },
+  { id: 'beard-trim-plus',       name: 'Beard Trim +',             price: 8.00,  duration: 15, description: "Beard trim with a hot towel razored 'line-up'." },
 ];
 
 // Keyed by JS day-of-week (0=Sun). Days absent = closed.

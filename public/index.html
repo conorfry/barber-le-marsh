@@ -128,8 +128,9 @@
   fetch('/api/services')
     .then(r => r.json())
     .then(services => {
-      const hair  = services.filter(s => !s.id.startsWith('beard')).sort((a, b) => b.price - a.price);
-      const beard = services.filter(s =>  s.id.startsWith('beard')).sort((a, b) => b.price - a.price);
+      const bundles = services.filter(s => s.id.startsWith('bundle')).sort((a, b) => b.price - a.price);
+      const hair    = services.filter(s => !s.id.startsWith('bundle') && !s.id.startsWith('beard')).sort((a, b) => b.price - a.price);
+      const beard   = services.filter(s => s.id.startsWith('beard')).sort((a, b) => b.price - a.price);
 
       const renderGroup = (title, items) => `
         <p class="services-group-label">${title}</p>
@@ -148,7 +149,7 @@
       `;
 
       document.getElementById('services-menu').innerHTML =
-        renderGroup('Hair', hair) + renderGroup('Beard', beard);
+        renderGroup('Bundles', bundles) + renderGroup('Hair & Styling', hair) + renderGroup('Beard', beard);
     })
     .catch(() => {
       document.getElementById('services-menu').innerHTML = '';
