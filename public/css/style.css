@@ -82,8 +82,6 @@ a   { color: inherit; text-decoration: none; }
   transition: color .2s;
 }
 .nav-links a:hover { color: var(--cream); }
-.nav-links a.nav-cta { color: #fff; background: #012169; padding: 6px 14px; border-radius: 4px; font-weight: 600; }
-.nav-links a.nav-cta:hover { background: #011247; color: #fff; }
 
 .nav-burger {
   display: none;
