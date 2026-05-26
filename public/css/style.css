@@ -235,6 +235,12 @@ a   { color: inherit; text-decoration: none; }
 }
 
 /* ── Sections (shared) ─────────────────────────────── */
+.union-jack-divider {
+  display: flex;
+  justify-content: center;
+  padding: 28px 0 0;
+  opacity: 0.35;
+}
 .section     { padding: 96px 24px; }
 .section--alt { background: var(--cream-alt); }
 .section--dark { background: var(--charcoal-2); }
