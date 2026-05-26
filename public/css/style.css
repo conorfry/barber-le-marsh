@@ -358,6 +358,12 @@ a   { color: inherit; text-decoration: none; }
   font-weight: 700;
   color: var(--charcoal);
 }
+.service-row-save {
+  font-size: 12px;
+  font-weight: 600;
+  color: #2a7a3b;
+  margin-left: 6px;
+}
 .services-cta {
   margin-top: 52px;
   text-align: center;

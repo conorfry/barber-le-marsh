@@ -152,7 +152,7 @@
             </div>
             <div class="service-row-right">
               <span class="service-row-dur">${s.duration} min</span>
-              <span class="service-row-price">£${s.price.toFixed(2)}</span>
+              <span class="service-row-price">£${s.price.toFixed(2)}${s.id.startsWith('bundle') ? ' <span class="service-row-save">Save 8%</span>' : ''}</span>
             </div>
           </div>
         `).join('')}
