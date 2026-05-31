@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Join the Queue — Barber le Marsh</title>
+  <style>
+    :root {
+      --bg:           #0a0a0a;
+      --surface:      #141414;
+      --border:       #242424;
+      --text:         #f0f0f0;
+      --muted:        #555;
+      --green-bg:     #0d2e18;
+      --green-border: #1a5c30;
+      --green-text:   #d4f0e0;
+      --amber-bg:     #2e1f00;
+      --amber-border: #5c3e00;
+      --amber-text:   #f5d98a;
+      --red-bg:       #2e0d0d;
+      --red-border:   #5c1a1a;
+      --red-text:     #f5a0a0;
+      --font:         -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 20px;
+    }
+
+    .wrap { width: 100%; max-width: 380px; }
+
+    /* ── Brand ── */
+    .brand {
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    /* ── State 1: Join form ── */
+    .form-title {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 6px;
+    }
+
+    .form-sub {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 32px;
+    }
+
+    .field { margin-bottom: 14px; }
+
+    label {
+      display: block;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 7px;
+    }
+
+    input {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 16px;
+      padding: 14px 15px;
+      border-radius: 4px;
+      outline: none;
+      -webkit-appearance: none;
+      transition: border-color 0.15s;
+    }
+
+    input:focus { border-color: #444; }
+
+    .btn-primary {
+      width: 100%;
+      background: var(--text);
+      color: var(--bg);
+      border: none;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: opacity 0.15s;
+    }
+
+    .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .error-msg {
+      font-size: 13px;
+      color: #ff6b6b;
+      margin-top: 12px;
+      display: none;
+    }
+
+    /* ── State 2: Status view ── */
+    #state-status { display: none; }
+
+    /* Status banner */
+    .banner {
+      border-radius: 6px;
+      padding: 18px 20px;
+      margin-bottom: 20px;
+      border-width: 1px;
+      border-style: solid;
+      transition: background 0.4s, border-color 0.4s;
+    }
+
+    .banner.green { background: var(--green-bg); border-color: var(--green-border); color: var(--green-text); }
+    .banner.amber { background: var(--amber-bg); border-color: var(--amber-border); color: var(--amber-text); }
+    .banner.red   { background: var(--red-bg);   border-color: var(--red-border);   color: var(--red-text);   }
+
+    .banner-label {
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      opacity: 0.6;
+      margin-bottom: 5px;
+    }
+
+    .banner-msg {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    /* Stat cards */
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .stat {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 20px 16px;
+    }
+
+    .stat-label {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .stat-value {
+      font-size: 36px;
+      font-weight: 700;
+      letter-spacing: -0.05em;
+      line-height: 1;
+    }
+
+    .stat-unit {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 5px;
+    }
+
+    .customer-tag {
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 12px;
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="brand">Barber le Marsh</p>
+
+  <!-- ── State 1: Join form ── -->
+  <div id="state-join">
+    <h1 class="form-title">Join the Queue</h1>
+    <p class="form-sub">Add your name and track your spot in real time.</p>
+
+    <div class="field">
+      <label for="inp-name">First Name</label>
+      <input id="inp-name" type="text" placeholder="e.g. James" autocomplete="given-name">
+    </div>
+    <div class="field">
+      <label for="inp-phone">Phone Number</label>
+      <input id="inp-phone" type="tel" placeholder="e.g. 07700 900000" autocomplete="tel">
+    </div>
+
+    <button class="btn-primary" id="join-btn" onclick="joinQueue()">Join the List</button>
+    <p class="error-msg" id="err-msg"></p>
+  </div>
+
+  <!-- ── State 2: Live status ── -->
+  <div id="state-status">
+    <div class="banner green" id="banner">
+      <p class="banner-label">Status</p>
+      <p class="banner-msg" id="banner-msg">Loading…</p>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <p class="stat-label">Position</p>
+        <p class="stat-value" id="stat-pos">—</p>
+        <p class="stat-unit">in line</p>
+      </div>
+      <div class="stat">
+        <p class="stat-label">Est. Wait</p>
+        <p class="stat-value" id="stat-wait">—</p>
+        <p class="stat-unit" id="stat-wait-unit">min</p>
+      </div>
+    </div>
+
+    <p class="customer-tag" id="customer-tag"></p>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // ── Config — replace with your Supabase project values ──────────────────────
+  const SUPABASE_URL      = 'YOUR_SUPABASE_URL';
+  const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+
+  // TODO: Replace with your n8n / Make / Zapier webhook URL
+  const WEBHOOK_URL = 'https://your-webhook-endpoint.example.com/queue';
+
+  // ── Init ─────────────────────────────────────────────────────────────────────
+  const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // Per-session state
+  let myId        = null;   // UUID of this customer's row
+  let myOrder     = null;   // queue_order value
+  let webhookSent = {};     // guards: { status_active: bool, position_3rd: bool }
+
+  // ── Webhook helper ────────────────────────────────────────────────────────────
+  async function triggerWebhook(eventType, customer) {
+    // TODO: replace WEBHOOK_URL above with real endpoint
+    try {
+      await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ eventType, customer }),
+      });
+    } catch (e) { console.warn('Webhook error:', e); }
+  }
+
+  // ── Join queue ────────────────────────────────────────────────────────────────
+  async function joinQueue() {
+    const name  = document.getElementById('inp-name').value.trim();
+    const phone = document.getElementById('inp-phone').value.trim();
+    const err   = document.getElementById('err-msg');
+    const btn   = document.getElementById('join-btn');
+
+    if (!name || !phone) {
+      err.textContent = 'Please fill in both fields.';
+      err.style.display = 'block';
+      return;
+    }
+
+    err.style.display = 'none';
+    btn.disabled = true;
+    btn.textContent = 'Joining…';
+
+    const { data, error } = await db
+      .from('daily_queue')
+      .insert({ customer_name: name, phone_number: phone, status: 'waiting' })
+      .select()
+      .single();
+
+    if (error || !data) {
+      err.textContent = 'Something went wrong — please try again.';
+      err.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Join the List';
+      return;
+    }
+
+    myId    = data.id;
+    myOrder = data.queue_order;
+
+    // Swap to status view
+    document.getElementById('state-join').style.display   = 'none';
+    document.getElementById('state-status').style.display = 'block';
+    document.getElementById('customer-tag').textContent    = `Queued as ${name}`;
+
+    await renderStatus();
+    subscribeRealtime();
+  }
+
+  // ── Render live status ────────────────────────────────────────────────────────
+  async function renderStatus() {
+    // Fetch this customer's current row
+    const { data: self } = await db
+      .from('daily_queue')
+      .select('status')
+      .eq('id', myId)
+      .single();
+
+    if (!self) return;
+
+    const isActive = self.status === 'active';
+
+    // Count waiting rows at or before this customer's position
+    const { count } = await db
+      .from('daily_queue')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'waiting')
+      .lte('queue_order', myOrder);
+
+    const position = isActive ? 0 : (count ?? 1);
+
+    updateBanner(position, isActive);
+    updateStats(position, isActive);
+    maybeFireWebhooks(position, isActive, self);
+  }
+
+  // ── Update banner ─────────────────────────────────────────────────────────────
+  function updateBanner(position, isActive) {
+    const banner = document.getElementById('banner');
+    const msg    = document.getElementById('banner-msg');
+
+    if (isActive || position <= 1) {
+      banner.className = 'banner red';
+      msg.textContent  = "You're Up — Please step inside.";
+    } else if (position <= 3) {
+      banner.className = 'banner amber';
+      msg.textContent  = 'Head This Way — Start traveling to the shop.';
+    } else {
+      banner.className = 'banner green';
+      msg.textContent  = 'Relax — You have time.';
+    }
+  }
+
+  // ── Update stat cards ─────────────────────────────────────────────────────────
+  function updateStats(position, isActive) {
+    const posEl      = document.getElementById('stat-pos');
+    const waitEl     = document.getElementById('stat-wait');
+    const waitUnitEl = document.getElementById('stat-wait-unit');
+
+    if (isActive) {
+      posEl.textContent      = '●';
+      waitEl.textContent     = '0';
+      waitUnitEl.textContent = 'min';
+      return;
+    }
+
+    posEl.textContent = position;
+
+    if (position <= 1) {
+      waitEl.textContent     = '0';
+      waitUnitEl.textContent = 'min';
+    } else {
+      // Each person = 20 min slot, displayed as a 15-min range
+      const lo = (position - 1) * 20;
+      const hi = lo + 15;
+      waitEl.textContent     = `${lo}–${hi}`;
+      waitUnitEl.textContent = 'min';
+    }
+  }
+
+  // ── Conditional webhook firing (once per session per event type) ──────────────
+  async function maybeFireWebhooks(position, isActive) {
+    if (isActive && !webhookSent.status_active) {
+      webhookSent.status_active = true;
+      const { data: customer } = await db.from('daily_queue').select('*').eq('id', myId).single();
+      triggerWebhook('status_active', customer);
+    }
+
+    if (position === 3 && !webhookSent.position_3rd) {
+      webhookSent.position_3rd = true;
+      const { data: customer } = await db.from('daily_queue').select('*').eq('id', myId).single();
+      triggerWebhook('position_3rd', customer);
+    }
+  }
+
+  // ── Supabase Realtime subscription ───────────────────────────────────────────
+  function subscribeRealtime() {
+    db.channel('customer-queue')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'daily_queue' }, () => {
+        renderStatus();
+      })
+      .subscribe();
+  }
+</script>
+</body>
+</html>

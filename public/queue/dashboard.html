@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Queue Dashboard — Barber le Marsh</title>
+  <style>
+    :root {
+      --bg:         #0a0a0a;
+      --surface:    #141414;
+      --surface-2:  #1c1c1c;
+      --border:     #242424;
+      --text:       #f0f0f0;
+      --muted:      #555;
+      --active-bg:  #0d2218;
+      --active-bdr: #1a4a30;
+      --active-txt: #5acea0;
+      --font:       -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 32px 20px 64px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* ── Header ── */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 40px;
+    }
+
+    .brand {
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* Pulsing live indicator */
+    .live-dot {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .live-dot::before {
+      content: '';
+      display: block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #3aaa70;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse { 0%,100%{ opacity:1 } 50%{ opacity:0.25 } }
+
+    /* ── Section labels ── */
+    .section-label {
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 18px;
+      margin-bottom: 28px;
+    }
+
+    /* ── Active customer banner ── */
+    .active-banner {
+      background: var(--active-bg);
+      border: 1px solid var(--active-bdr);
+      border-radius: 6px;
+      padding: 16px 18px;
+      margin-bottom: 28px;
+      display: none;
+    }
+
+    .active-banner-label {
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--active-txt);
+      margin-bottom: 5px;
+    }
+
+    .active-banner-name {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .active-banner-phone {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* ── Walk-in form ── */
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 10px;
+      align-items: end;
+    }
+
+    label {
+      display: block;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 15px;
+      padding: 11px 12px;
+      border-radius: 4px;
+      outline: none;
+      -webkit-appearance: none;
+      transition: border-color 0.15s;
+    }
+
+    input:focus { border-color: #444; }
+
+    /* ── Buttons ── */
+    .btn {
+      background: var(--text);
+      color: var(--bg);
+      border: none;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 12px 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity 0.15s;
+    }
+
+    .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+
+    .btn-outline:hover { border-color: #555; }
+
+    .btn-danger {
+      background: transparent;
+      color: #d06060;
+      border: 1px solid #3a1818;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .btn-call {
+      width: 100%;
+      padding: 18px;
+      font-size: 13px;
+      border-radius: 4px;
+      margin-bottom: 28px;
+    }
+
+    /* ── Queue list ── */
+    .queue-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .count-pill {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 9px;
+      border-radius: 20px;
+    }
+
+    .queue-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .queue-row:last-child { border-bottom: none; }
+
+    .queue-left { display: flex; align-items: center; gap: 14px; }
+
+    .pos-num {
+      font-size: 12px;
+      color: var(--muted);
+      width: 18px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .q-name {
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .q-phone {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .queue-actions { display: flex; gap: 8px; }
+
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+      padding: 32px 0;
+    }
+
+    @media (max-width: 480px) {
+      .form-row { grid-template-columns: 1fr 1fr; }
+      .form-row .btn { grid-column: span 2; width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <span class="brand">Barber le Marsh — Queue</span>
+    <span class="live-dot">Live</span>
+  </div>
+
+  <!-- Now Serving -->
+  <div class="active-banner" id="active-banner">
+    <p class="active-banner-label">Now Serving</p>
+    <p class="active-banner-name" id="active-name"></p>
+    <p class="active-banner-phone" id="active-phone"></p>
+  </div>
+
+  <!-- Add Walk-In -->
+  <p class="section-label">Add Walk-In</p>
+  <div class="card">
+    <div class="form-row">
+      <div>
+        <label for="wk-name">Name</label>
+        <input id="wk-name" type="text" placeholder="First name">
+      </div>
+      <div>
+        <label for="wk-phone">Phone</label>
+        <input id="wk-phone" type="tel" placeholder="07700…">
+      </div>
+      <button class="btn" id="add-btn" onclick="addWalkin()">Add</button>
+    </div>
+  </div>
+
+  <!-- Call Next -->
+  <button class="btn btn-call" id="call-btn" onclick="callNext()">Call Next →</button>
+
+  <!-- Live Queue -->
+  <div class="queue-header">
+    <p class="section-label" style="margin-bottom:0">Waiting</p>
+    <span class="count-pill" id="q-count">0</span>
+  </div>
+  <div class="card" id="q-list">
+    <p class="empty">Queue is empty</p>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // ── Config — replace with your Supabase project values ──────────────────────
+  const SUPABASE_URL      = 'YOUR_SUPABASE_URL';
+  const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+
+  // TODO: Replace with your n8n / Make / Zapier webhook URL
+  const WEBHOOK_URL = 'https://your-webhook-endpoint.example.com/queue';
+
+  // ── Init ─────────────────────────────────────────────────────────────────────
+  const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // ── Webhook helper ────────────────────────────────────────────────────────────
+  async function triggerWebhook(eventType, customer) {
+    // TODO: replace WEBHOOK_URL above with real endpoint
+    try {
+      await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ eventType, customer }),
+      });
+    } catch (e) { console.warn('Webhook error:', e); }
+  }
+
+  // ── Add walk-in customer ──────────────────────────────────────────────────────
+  async function addWalkin() {
+    const name  = document.getElementById('wk-name').value.trim();
+    const phone = document.getElementById('wk-phone').value.trim();
+    if (!name || !phone) return;
+
+    const btn = document.getElementById('add-btn');
+    btn.disabled = true;
+
+    await db.from('daily_queue').insert({
+      customer_name: name,
+      phone_number:  phone,
+      status:        'waiting',
+    });
+
+    document.getElementById('wk-name').value  = '';
+    document.getElementById('wk-phone').value = '';
+    btn.disabled = false;
+    document.getElementById('wk-name').focus();
+  }
+
+  // ── Call next waiting customer ────────────────────────────────────────────────
+  async function callNext() {
+    const btn = document.getElementById('call-btn');
+    btn.disabled = true;
+
+    const { data } = await db
+      .from('daily_queue')
+      .select('*')
+      .eq('status', 'waiting')
+      .order('queue_order', { ascending: true })
+      .limit(1)
+      .single();
+
+    if (!data) { btn.disabled = false; return; }
+
+    await db.from('daily_queue').update({ status: 'active' }).eq('id', data.id);
+    triggerWebhook('status_active', data);
+    btn.disabled = false;
+  }
+
+  // ── Update a customer's status ────────────────────────────────────────────────
+  async function setStatus(id, status) {
+    await db.from('daily_queue').update({ status }).eq('id', id);
+  }
+
+  // ── Escape HTML to prevent XSS ────────────────────────────────────────────────
+  function esc(str) {
+    return String(str)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ── Render full dashboard ─────────────────────────────────────────────────────
+  async function render() {
+    const [{ data: waiting }, { data: activeRows }] = await Promise.all([
+      db.from('daily_queue').select('*').eq('status','waiting').order('queue_order',{ascending:true}),
+      db.from('daily_queue').select('*').eq('status','active').order('queue_order',{ascending:true}).limit(1),
+    ]);
+
+    const active = activeRows?.[0] ?? null;
+
+    // ── Now Serving banner ──
+    const banner = document.getElementById('active-banner');
+    if (active) {
+      banner.style.display = 'block';
+      document.getElementById('active-name').textContent  = esc(active.customer_name);
+      document.getElementById('active-phone').textContent = esc(active.phone_number);
+    } else {
+      banner.style.display = 'none';
+    }
+
+    // ── Queue count ──
+    document.getElementById('q-count').textContent = waiting?.length ?? 0;
+
+    // ── Queue rows ──
+    const list = document.getElementById('q-list');
+
+    if (!waiting || waiting.length === 0) {
+      list.innerHTML = '<p class="empty">Queue is empty</p>';
+      return;
+    }
+
+    list.innerHTML = waiting.map((row, i) => `
+      <div class="queue-row">
+        <div class="queue-left">
+          <span class="pos-num">${i + 1}</span>
+          <div>
+            <p class="q-name">${esc(row.customer_name)}</p>
+            <p class="q-phone">${esc(row.phone_number)}</p>
+          </div>
+        </div>
+        <div class="queue-actions">
+          <button class="btn-outline" onclick="setStatus('${row.id}','completed')">Done</button>
+          <button class="btn-danger"  onclick="setStatus('${row.id}','noshow')">No-Show</button>
+        </div>
+      </div>
+    `).join('');
+
+    // Fire position_3rd webhook for the customer currently in 3rd place
+    if (waiting.length >= 3) {
+      triggerWebhook('position_3rd', waiting[2]);
+    }
+  }
+
+  // ── Supabase Realtime — re-render on any change ───────────────────────────────
+  db.channel('dashboard')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'daily_queue' }, () => {
+      render();
+    })
+    .subscribe();
+
+  // ── Initial load ──────────────────────────────────────────────────────────────
+  render();
+
+  // Allow Enter key to submit walk-in form
+  ['wk-name','wk-phone'].forEach(id => {
+    document.getElementById(id).addEventListener('keydown', e => {
+      if (e.key === 'Enter') addWalkin();
+    });
+  });
+</script>
+</body>
+</html>
