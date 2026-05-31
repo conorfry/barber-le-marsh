@@ -299,7 +299,13 @@
         <p class="active-banner-name" id="active-name"></p>
         <p class="active-banner-phone" id="active-phone"></p>
       </div>
-      <p class="active-banner-timer" id="active-timer"></p>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+        <p class="active-banner-timer" id="active-timer"></p>
+        <div style="display:flex;gap:8px">
+          <button class="btn-outline" id="active-done-btn">Done</button>
+          <button class="btn-danger"  id="active-noshow-btn">No-Show</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -447,6 +453,8 @@
       banner.style.display = 'block';
       document.getElementById('active-name').textContent  = esc(active.customer_name);
       document.getElementById('active-phone').textContent = esc(active.phone_number);
+      document.getElementById('active-done-btn').onclick   = () => setStatus(active.id, 'completed');
+      document.getElementById('active-noshow-btn').onclick = () => setStatus(active.id, 'noshow');
       if (active.activated_at && !active.confirmed) {
         startDashboardTimer(active.activated_at);
       } else {
