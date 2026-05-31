@@ -244,7 +244,7 @@
     <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border);font-size:13px;color:var(--muted);line-height:1.7">
       <p>Walk-in queue opens at <strong style="color:var(--text)">9:00 am</strong></p>
       <p>Doors open at <strong style="color:var(--text)">10:00 am</strong></p>
-      <p>Last walk-in accepted by <strong style="color:var(--text)">6:00 pm</strong></p>
+      <p>Last walk-in accepted by <strong style="color:var(--text)">5:30 pm</strong></p>
     </div>
   </div>
 
@@ -316,6 +316,13 @@
 
     if (!name || !phone) {
       showError('Please fill in both fields.');
+      return;
+    }
+
+    // Block joins after 17:30
+    const now = new Date();
+    if (now.getHours() > 17 || (now.getHours() === 17 && now.getMinutes() >= 30)) {
+      showError('Sorry, the queue is now closed for today. We open again tomorrow at 9:00 am.');
       return;
     }
 
