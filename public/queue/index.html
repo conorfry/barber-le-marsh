@@ -350,12 +350,30 @@
     } catch (e) { console.warn('Webhook error:', e); }
   }
 
+  // ── Opening hours check ───────────────────────────────────────────────────────
+  function isOpen() {
+    const now = new Date();
+    const day  = now.getDay(); // 0=Sun,1=Mon,2=Tue,3=Wed,4=Thu,5=Fri,6=Sat
+    const mins = now.getHours() * 60 + now.getMinutes();
+    const openMins  = 10 * 60;
+    const closeMins = (day === 6 ? 14 : 17) * 60 + 30; // 14:30 Sat, 17:30 otherwise
+    return day >= 2 && day <= 6 && mins >= openMins && mins < closeMins;
+  }
+
   // ── Live queue count indicator ────────────────────────────────────────────────
   function updateQueueStatus(count) {
     const dot  = document.getElementById('status-dot');
     const text = document.getElementById('status-text');
     if (!dot || !text) return;
 
+    if (!isOpen()) {
+      dot.className  = 'queue-status-dot red';
+      dot.style.animation = 'none';
+      text.innerHTML = '<span class="red">Closed</span> — queue not available right now';
+      return;
+    }
+
+    dot.style.animation = '';
     let colour, label;
     if (count === 0) {
       colour = 'green'; label = '<span class="green">No wait</span> — walk right in';
