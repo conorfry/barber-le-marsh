@@ -217,6 +217,42 @@
       color: var(--muted);
       margin-top: 12px;
     }
+
+    .queue-status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 28px;
+      padding: 14px 16px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .queue-status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .queue-status-dot.green { background: #3aaa70; }
+    .queue-status-dot.amber { background: #d4952a; }
+    .queue-status-dot.red   { background: #c94f4f; }
+
+    .queue-status-text {
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    .queue-status-text span {
+      font-weight: 600;
+    }
+
+    .queue-status-text span.green { color: #3aaa70; }
+    .queue-status-text span.amber { color: #d4952a; }
+    .queue-status-text span.red   { color: #c94f4f; }
   </style>
 </head>
 <body>
@@ -230,6 +266,11 @@
   <div id="state-join">
     <h1 class="form-title">Join the Queue</h1>
     <p class="form-sub">Add your name and track your spot in real time.</p>
+
+    <div class="queue-status" id="queue-status">
+      <div class="queue-status-dot green" id="status-dot"></div>
+      <p class="queue-status-text" id="status-text">Checking queue…</p>
+    </div>
 
     <div class="field">
       <label for="inp-name">First Name</label>
@@ -308,6 +349,41 @@
       });
     } catch (e) { console.warn('Webhook error:', e); }
   }
+
+  // ── Live queue count indicator ────────────────────────────────────────────────
+  function updateQueueStatus(count) {
+    const dot  = document.getElementById('status-dot');
+    const text = document.getElementById('status-text');
+    if (!dot || !text) return;
+
+    let colour, label;
+    if (count === 0) {
+      colour = 'green'; label = '<span class="green">No wait</span> — walk right in';
+    } else if (count <= 2) {
+      colour = 'green'; label = `<span class="green">${count} waiting</span> — short wait`;
+    } else if (count <= 5) {
+      colour = 'amber'; label = `<span class="amber">${count} waiting</span> — moderate wait`;
+    } else {
+      colour = 'red'; label = `<span class="red">${count} waiting</span> — busy right now`;
+    }
+
+    dot.className  = `queue-status-dot ${colour}`;
+    text.innerHTML = label;
+  }
+
+  async function fetchQueueCount() {
+    const { count } = await db
+      .from('daily_queue')
+      .select('*', { count: 'exact', head: true })
+      .in('status', ['waiting', 'active']);
+    updateQueueStatus(count ?? 0);
+  }
+
+  fetchQueueCount();
+
+  db.channel('queue-count')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'daily_queue' }, fetchQueueCount)
+    .subscribe();
 
   // ── Join queue ────────────────────────────────────────────────────────────────
   async function joinQueue() {
