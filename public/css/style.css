@@ -83,6 +83,22 @@ a   { color: inherit; text-decoration: none; }
 }
 .nav-links a:hover { color: var(--cream); }
 
+.nav-queue-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-left: 6px;
+  vertical-align: middle;
+  position: relative;
+  top: -1px;
+}
+.nav-queue-dot.green { background: #3aaa70; animation: nav-pulse 2s ease-in-out infinite; }
+.nav-queue-dot.amber { background: #d4952a; animation: nav-pulse 2s ease-in-out infinite; }
+.nav-queue-dot.red   { background: #c94f4f; animation: nav-pulse 2s ease-in-out infinite; }
+.nav-queue-dot.grey  { background: #555; }
+@keyframes nav-pulse { 0%,100%{ opacity:1 } 50%{ opacity:0.3 } }
+
 .nav-burger {
   display: none;
   flex-direction: column;
