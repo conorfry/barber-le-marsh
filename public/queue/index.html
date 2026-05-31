@@ -287,6 +287,7 @@
     <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border);font-size:13px;color:var(--muted);line-height:1.7">
       <p>Walk-in queue opens at <strong style="color:var(--text)">9:00 am</strong></p>
       <p>Doors open at <strong style="color:var(--text)">10:00 am</strong></p>
+      <p>Open <strong style="color:var(--text)">Tuesday – Sunday</strong>, closed Monday</p>
       <p>Last walk-in accepted by <strong style="color:var(--text)">5:30 pm</strong></p>
     </div>
   </div>
@@ -356,8 +357,9 @@
     const day  = now.getDay(); // 0=Sun,1=Mon,2=Tue,3=Wed,4=Thu,5=Fri,6=Sat
     const mins = now.getHours() * 60 + now.getMinutes();
     const openMins  = 10 * 60;
-    const closeMins = (day === 6 ? 14 : 17) * 60 + 30; // 14:30 Sat, 17:30 otherwise
-    return day >= 2 && day <= 6 && mins >= openMins && mins < closeMins;
+    const closeMins = 17 * 60 + 30; // 17:30 all open days
+    const isOpenDay = day >= 2 && day <= 6 || day === 0; // Tue–Sun, closed Mon
+    return isOpenDay && mins >= openMins && mins < closeMins;
   }
 
   // ── Live queue count indicator ────────────────────────────────────────────────
@@ -415,13 +417,16 @@
       return;
     }
 
-    // Block joins after cutoff (17:30 weekdays, 14:30 Saturday)
+    // Block joins after 17:30 or on Mondays
     const now = new Date();
-    const isSaturday = now.getDay() === 6;
-    const cutoffHour = isSaturday ? 14 : 17;
-    const cutoffMin  = 30;
-    if (now.getHours() > cutoffHour || (now.getHours() === cutoffHour && now.getMinutes() >= cutoffMin)) {
-      showError('Sorry, the queue is now closed for today. We open again Tuesday at 9:00 am.');
+    const day = now.getDay();
+    if (day === 1) {
+      showError('Sorry, we\'re closed on Mondays. We open again Tuesday at 9:00 am.');
+      return;
+    }
+    if (now.getHours() > 17 || (now.getHours() === 17 && now.getMinutes() >= 30)) {
+      const nextOpen = day === 0 ? 'Tuesday' : 'tomorrow';
+      showError(`Sorry, the queue is now closed for today. We open again ${nextOpen} at 9:00 am.`);
       return;
     }
 
