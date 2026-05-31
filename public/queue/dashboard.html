@@ -115,6 +115,23 @@
       margin-top: 2px;
     }
 
+    .active-banner-timer {
+      font-size: 12px;
+      margin-top: 8px;
+      color: var(--active-txt);
+    }
+
+    .active-banner-timer.urgent {
+      color: #e07070;
+    }
+
+    .active-banner-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
     /* ── Walk-in form ── */
     .form-row {
       display: grid;
@@ -276,8 +293,13 @@
   <!-- Now Serving -->
   <div class="active-banner" id="active-banner">
     <p class="active-banner-label">Now Serving</p>
-    <p class="active-banner-name" id="active-name"></p>
-    <p class="active-banner-phone" id="active-phone"></p>
+    <div class="active-banner-row">
+      <div>
+        <p class="active-banner-name" id="active-name"></p>
+        <p class="active-banner-phone" id="active-phone"></p>
+      </div>
+      <p class="active-banner-timer" id="active-timer"></p>
+    </div>
   </div>
 
   <!-- Add Walk-In -->
@@ -368,7 +390,9 @@
 
     if (!data) { btn.disabled = false; return; }
 
-    await db.from('daily_queue').update({ status: 'active' }).eq('id', data.id);
+    await db.from('daily_queue')
+      .update({ status: 'active', activated_at: new Date().toISOString() })
+      .eq('id', data.id);
     triggerWebhook('status_active', data);
     btn.disabled = false;
   }
@@ -383,6 +407,28 @@
     return String(str)
       .replace(/&/g,'&amp;').replace(/</g,'&lt;')
       .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ── Active customer countdown ─────────────────────────────────────────────────
+  const CONFIRM_SECONDS = 300;
+  let timerInterval = null;
+
+  function startDashboardTimer(activatedAt) {
+    clearInterval(timerInterval);
+    const timerEl = document.getElementById('active-timer');
+    if (!timerEl) return;
+
+    function tick() {
+      const elapsed = (Date.now() - new Date(activatedAt).getTime()) / 1000;
+      const remaining = Math.max(0, CONFIRM_SECONDS - elapsed);
+      const m = Math.floor(remaining / 60);
+      const s = Math.floor(remaining % 60);
+      timerEl.textContent = `${m}:${s.toString().padStart(2,'0')} to confirm`;
+      timerEl.classList.toggle('urgent', remaining < 60);
+    }
+
+    tick();
+    timerInterval = setInterval(tick, 1000);
   }
 
   // ── Render full dashboard ─────────────────────────────────────────────────────
@@ -400,8 +446,16 @@
       banner.style.display = 'block';
       document.getElementById('active-name').textContent  = esc(active.customer_name);
       document.getElementById('active-phone').textContent = esc(active.phone_number);
+      if (active.activated_at && !active.confirmed) {
+        startDashboardTimer(active.activated_at);
+      } else {
+        clearInterval(timerInterval);
+        const timerEl = document.getElementById('active-timer');
+        if (timerEl) timerEl.textContent = active.confirmed ? 'Confirmed ✓' : '';
+      }
     } else {
       banner.style.display = 'none';
+      clearInterval(timerInterval);
     }
 
     // ── Queue count ──

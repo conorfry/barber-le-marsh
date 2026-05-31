@@ -20,6 +20,9 @@
       --red-bg:       #2e0d0d;
       --red-border:   #5c1a1a;
       --red-text:     #f5a0a0;
+      --grey-bg:      #1a1a1a;
+      --grey-border:  #333;
+      --grey-text:    #888;
       --font:         -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     }
 
@@ -38,7 +41,6 @@
 
     .wrap { width: 100%; max-width: 380px; }
 
-    /* ── Brand ── */
     .brand {
       font-size: 11px;
       letter-spacing: 0.18em;
@@ -116,7 +118,6 @@
     /* ── State 2: Status view ── */
     #state-status { display: none; }
 
-    /* Status banner */
     .banner {
       border-radius: 6px;
       padding: 18px 20px;
@@ -128,7 +129,8 @@
 
     .banner.green { background: var(--green-bg); border-color: var(--green-border); color: var(--green-text); }
     .banner.amber { background: var(--amber-bg); border-color: var(--amber-border); color: var(--amber-text); }
-    .banner.red   { background: var(--red-bg);   border-color: var(--red-border);   color: var(--red-text);   }
+    .banner.red   { background: var(--red-bg);   border-color: var(--red-border);   color: var(--red-text); }
+    .banner.grey  { background: var(--grey-bg);  border-color: var(--grey-border);  color: var(--grey-text); }
 
     .banner-label {
       font-size: 10px;
@@ -143,6 +145,34 @@
       font-weight: 600;
       letter-spacing: -0.01em;
     }
+
+    /* Confirmation timer section */
+    .confirm-section {
+      display: none;
+      margin-top: 14px;
+    }
+
+    .countdown {
+      font-size: 13px;
+      opacity: 0.75;
+      margin-bottom: 12px;
+    }
+
+    .btn-confirm {
+      width: 100%;
+      background: var(--text);
+      color: var(--bg);
+      border: none;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 14px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .btn-confirm:disabled { opacity: 0.4; cursor: not-allowed; }
 
     /* Stat cards */
     .stats {
@@ -193,7 +223,7 @@
 
   <p class="brand">Barber le Marsh</p>
 
-  <!-- ── State 1: Join form ── -->
+  <!-- State 1: Join form -->
   <div id="state-join">
     <h1 class="form-title">Join the Queue</h1>
     <p class="form-sub">Add your name and track your spot in real time.</p>
@@ -211,11 +241,17 @@
     <p class="error-msg" id="err-msg"></p>
   </div>
 
-  <!-- ── State 2: Live status ── -->
+  <!-- State 2: Live status -->
   <div id="state-status">
     <div class="banner green" id="banner">
       <p class="banner-label">Status</p>
       <p class="banner-msg" id="banner-msg">Loading…</p>
+
+      <!-- Confirmation timer — shown only when status is active -->
+      <div class="confirm-section" id="confirm-section">
+        <p class="countdown" id="countdown-text"></p>
+        <button class="btn-confirm" id="confirm-btn" onclick="confirmArrival()">I'm Here ✓</button>
+      </div>
     </div>
 
     <div class="stats">
@@ -238,24 +274,23 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  // ── Config — replace with your Supabase project values ──────────────────────
   const SUPABASE_URL      = 'https://isgtzoqtrirzxnyhsitv.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlzZ3R6b3F0cmlyenhueWhzaXR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyNDQ3OTgsImV4cCI6MjA5NTgyMDc5OH0.G3hiIyI7AOaA1CUnIM-KybkYZJrsCXLkmooiEpGpmU4';
 
   // TODO: Replace with your n8n / Make / Zapier webhook URL
   const WEBHOOK_URL = 'https://your-webhook-endpoint.example.com/queue';
 
-  // ── Init ─────────────────────────────────────────────────────────────────────
+  const CONFIRM_SECONDS = 300; // 5 minutes to confirm arrival
+
   const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  // Per-session state
-  let myId        = null;   // UUID of this customer's row
-  let myOrder     = null;   // queue_order value
-  let webhookSent = {};     // guards: { status_active: bool, position_3rd: bool }
+  let myId        = null;
+  let myOrder     = null;
+  let countdownInterval = null;
+  let webhookSent = {};
 
-  // ── Webhook helper ────────────────────────────────────────────────────────────
+  // ── Webhook ───────────────────────────────────────────────────────────────────
   async function triggerWebhook(eventType, customer) {
-    // TODO: replace WEBHOOK_URL above with real endpoint
     try {
       await fetch(WEBHOOK_URL, {
         method: 'POST',
@@ -273,13 +308,33 @@
     const btn   = document.getElementById('join-btn');
 
     if (!name || !phone) {
-      err.textContent = 'Please fill in both fields.';
-      err.style.display = 'block';
+      showError('Please fill in both fields.');
       return;
     }
 
     err.style.display = 'none';
     btn.disabled = true;
+    btn.textContent = 'Checking…';
+
+    // Feature 1: block duplicate phone numbers in today's queue
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+
+    const { data: existing } = await db
+      .from('daily_queue')
+      .select('id')
+      .eq('phone_number', phone)
+      .in('status', ['waiting', 'active'])
+      .gte('created_at', todayStart.toISOString())
+      .limit(1);
+
+    if (existing && existing.length > 0) {
+      showError('This number is already in the queue today.');
+      btn.disabled = false;
+      btn.textContent = 'Join the List';
+      return;
+    }
+
     btn.textContent = 'Joining…';
 
     const { data, error } = await db
@@ -289,8 +344,7 @@
       .single();
 
     if (error || !data) {
-      err.textContent = 'Something went wrong — please try again.';
-      err.style.display = 'block';
+      showError('Something went wrong — please try again.');
       btn.disabled = false;
       btn.textContent = 'Join the List';
       return;
@@ -299,7 +353,6 @@
     myId    = data.id;
     myOrder = data.queue_order;
 
-    // Swap to status view
     document.getElementById('state-join').style.display   = 'none';
     document.getElementById('state-status').style.display = 'block';
     document.getElementById('customer-tag').textContent    = `Queued as ${name}`;
@@ -308,20 +361,38 @@
     subscribeRealtime();
   }
 
+  function showError(msg) {
+    const el = document.getElementById('err-msg');
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+
+  // ── Confirm arrival ("I'm Here") ──────────────────────────────────────────────
+  async function confirmArrival() {
+    document.getElementById('confirm-btn').disabled = true;
+    clearInterval(countdownInterval);
+    await db.from('daily_queue').update({ confirmed: true }).eq('id', myId);
+    document.getElementById('confirm-section').style.display = 'none';
+    document.getElementById('banner-msg').textContent = "Confirmed — Please step inside.";
+  }
+
   // ── Render live status ────────────────────────────────────────────────────────
   async function renderStatus() {
-    // Fetch this customer's current row
     const { data: self } = await db
       .from('daily_queue')
-      .select('status')
+      .select('status, confirmed, activated_at')
       .eq('id', myId)
       .single();
 
     if (!self) return;
 
+    if (self.status === 'noshow') {
+      showNoshowState();
+      return;
+    }
+
     const isActive = self.status === 'active';
 
-    // Count waiting rows at or before this customer's position
     const { count } = await db
       .from('daily_queue')
       .select('id', { count: 'exact', head: true })
@@ -330,17 +401,64 @@
 
     const position = isActive ? 0 : (count ?? 1);
 
-    updateBanner(position, isActive);
+    updateBanner(position, isActive, self);
     updateStats(position, isActive);
-    maybeFireWebhooks(position, isActive, self);
+    maybeFireWebhooks(position, isActive);
+
+    // Feature 3: start confirmation countdown if active and not yet confirmed
+    if (isActive && !self.confirmed && self.activated_at) {
+      startCountdown(self.activated_at);
+    }
+  }
+
+  // ── No-show state ─────────────────────────────────────────────────────────────
+  function showNoshowState() {
+    clearInterval(countdownInterval);
+    const banner = document.getElementById('banner');
+    banner.className = 'banner grey';
+    document.getElementById('banner-msg').textContent = "Your spot was given away — please rejoin if you still need a cut.";
+    document.getElementById('confirm-section').style.display = 'none';
+    document.getElementById('stat-pos').textContent  = '—';
+    document.getElementById('stat-wait').textContent = '—';
+  }
+
+  // ── Confirmation countdown ────────────────────────────────────────────────────
+  function startCountdown(activatedAt) {
+    // Avoid duplicate intervals
+    if (countdownInterval) return;
+
+    const confirmSection = document.getElementById('confirm-section');
+    const countdownText  = document.getElementById('countdown-text');
+    confirmSection.style.display = 'block';
+
+    function tick() {
+      const elapsed  = (Date.now() - new Date(activatedAt).getTime()) / 1000;
+      const remaining = Math.max(0, CONFIRM_SECONDS - elapsed);
+      const mins = Math.floor(remaining / 60);
+      const secs = Math.floor(remaining % 60);
+      countdownText.textContent = `Confirm within ${mins}:${String(secs).padStart(2,'0')} or lose your spot`;
+
+      if (remaining <= 0) {
+        clearInterval(countdownInterval);
+        // Auto no-show: customer didn't confirm in time
+        db.from('daily_queue').update({ status: 'noshow' }).eq('id', myId);
+      }
+    }
+
+    tick();
+    countdownInterval = setInterval(tick, 1000);
   }
 
   // ── Update banner ─────────────────────────────────────────────────────────────
-  function updateBanner(position, isActive) {
+  function updateBanner(position, isActive, self) {
     const banner = document.getElementById('banner');
     const msg    = document.getElementById('banner-msg');
 
-    if (isActive || position <= 1) {
+    if (isActive && self.confirmed) {
+      banner.className = 'banner red';
+      msg.textContent  = "Confirmed — Please step inside.";
+      document.getElementById('confirm-section').style.display = 'none';
+    } else if (isActive) {
       banner.className = 'banner red';
       msg.textContent  = "You're Up — Please step inside.";
     } else if (position <= 3) {
@@ -371,7 +489,6 @@
       waitEl.textContent     = '0';
       waitUnitEl.textContent = 'min';
     } else {
-      // Each person = 20 min slot, displayed as a 15-min range
       const lo = (position - 1) * 20;
       const hi = lo + 15;
       waitEl.textContent     = `${lo}–${hi}`;
@@ -379,22 +496,21 @@
     }
   }
 
-  // ── Conditional webhook firing (once per session per event type) ──────────────
+  // ── Webhook triggers (once per session per event) ─────────────────────────────
   async function maybeFireWebhooks(position, isActive) {
     if (isActive && !webhookSent.status_active) {
       webhookSent.status_active = true;
-      const { data: customer } = await db.from('daily_queue').select('*').eq('id', myId).single();
-      triggerWebhook('status_active', customer);
+      const { data: c } = await db.from('daily_queue').select('*').eq('id', myId).single();
+      triggerWebhook('status_active', c);
     }
-
     if (position === 3 && !webhookSent.position_3rd) {
       webhookSent.position_3rd = true;
-      const { data: customer } = await db.from('daily_queue').select('*').eq('id', myId).single();
-      triggerWebhook('position_3rd', customer);
+      const { data: c } = await db.from('daily_queue').select('*').eq('id', myId).single();
+      triggerWebhook('position_3rd', c);
     }
   }
 
-  // ── Supabase Realtime subscription ───────────────────────────────────────────
+  // ── Supabase Realtime ─────────────────────────────────────────────────────────
   function subscribeRealtime() {
     db.channel('customer-queue')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'daily_queue' }, () => {
