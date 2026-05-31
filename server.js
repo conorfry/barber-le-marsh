@@ -53,6 +53,10 @@ function writeBookings(data) {
   fs.writeFileSync(BOOKINGS_FILE, JSON.stringify(data, null, 2));
 }
 
+app.get('/queue/dashboard', (_req, res) =>
+  res.sendFile(path.join(__dirname, 'public/queue/dashboard.html'))
+);
+
 app.get('/api/services', (_req, res) => res.json(SERVICES));
 app.get('/api/hours',   (_req, res) => res.json(OPENING_HOURS));
 
