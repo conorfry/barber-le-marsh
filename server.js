@@ -53,9 +53,20 @@ function writeBookings(data) {
   fs.writeFileSync(BOOKINGS_FILE, JSON.stringify(data, null, 2));
 }
 
-app.get('/queue/dashboard', (_req, res) =>
-  res.sendFile(path.join(__dirname, 'public/queue/dashboard.html'))
-);
+const DASHBOARD_USER = process.env.DASHBOARD_USER || 'barber';
+const DASHBOARD_PASS = process.env.DASHBOARD_PASS || 'changeme';
+
+app.get('/queue/dashboard', (req, res) => {
+  const auth = req.headers.authorization;
+  if (auth && auth.startsWith('Basic ')) {
+    const [user, pass] = Buffer.from(auth.slice(6), 'base64').toString().split(':');
+    if (user === DASHBOARD_USER && pass === DASHBOARD_PASS) {
+      return res.sendFile(path.join(__dirname, 'public/queue/dashboard.html'));
+    }
+  }
+  res.set('WWW-Authenticate', 'Basic realm="Dashboard"');
+  res.status(401).send('Unauthorised');
+});
 
 app.get('/api/services', (_req, res) => res.json(SERVICES));
 app.get('/api/hours',   (_req, res) => res.json(OPENING_HOURS));
