@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 const { v4: uuidv4 } = require('uuid');
 
 const app = express();
@@ -54,19 +55,156 @@ function writeBookings(data) {
   fs.writeFileSync(BOOKINGS_FILE, JSON.stringify(data, null, 2));
 }
 
-const DASHBOARD_USER = process.env.DASHBOARD_USER || 'barber';
-const DASHBOARD_PASS = process.env.DASHBOARD_PASS || 'changeme';
+const DASHBOARD_USER   = process.env.DASHBOARD_USER   || 'barber';
+const DASHBOARD_PASS   = process.env.DASHBOARD_PASS   || 'changeme';
+const COOKIE_SECRET    = process.env.COOKIE_SECRET    || 'blm-dashboard-secret';
+const DASHBOARD_COOKIE = 'blm_dash';
+
+function parseCookies(req) {
+  const out = {};
+  const header = req.headers.cookie;
+  if (!header) return out;
+  for (const part of header.split(';')) {
+    const [k, ...v] = part.trim().split('=');
+    if (k) out[k.trim()] = v.join('=').trim();
+  }
+  return out;
+}
+
+function signToken(value) {
+  const sig = crypto.createHmac('sha256', COOKIE_SECRET).update(value).digest('hex');
+  return `${value}.${sig}`;
+}
+
+function verifyToken(signed) {
+  if (!signed) return false;
+  const dot = signed.lastIndexOf('.');
+  if (dot === -1) return false;
+  const value = signed.slice(0, dot);
+  return signToken(value) === signed && value === 'ok';
+}
+
+function dashboardLoginPage(error) {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Login — Barber le Marsh</title>
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0a0a0a;
+      color: #f0f0f0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      background: #141414;
+      border: 1px solid #242424;
+      border-radius: 12px;
+      padding: 40px 32px;
+      width: 100%;
+      max-width: 360px;
+    }
+    .brand {
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #555;
+      margin-bottom: 28px;
+      text-align: center;
+    }
+    h1 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    label {
+      display: block;
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 6px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    input {
+      display: block;
+      width: 100%;
+      padding: 12px 14px;
+      background: #1c1c1c;
+      border: 1px solid #242424;
+      border-radius: 8px;
+      color: #f0f0f0;
+      font-size: 16px;
+      margin-bottom: 16px;
+      outline: none;
+      -webkit-appearance: none;
+    }
+    input:focus { border-color: #5acea0; }
+    button {
+      width: 100%;
+      padding: 13px;
+      background: #5acea0;
+      color: #0a0a0a;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 4px;
+    }
+    button:active { opacity: 0.85; }
+    .error {
+      background: #2a0d0d;
+      border: 1px solid #5a2020;
+      color: #e08080;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <p class="brand">Barber le Marsh</p>
+    <h1>Queue Dashboard</h1>
+    ${error ? '<p class="error">Incorrect username or password.</p>' : ''}
+    <form method="POST" action="/queue/dashboard/login">
+      <label for="u">Username</label>
+      <input id="u" name="username" type="text" autocomplete="username" autocapitalize="none" required>
+      <label for="p">Password</label>
+      <input id="p" name="password" type="password" autocomplete="current-password" required>
+      <button type="submit">Sign in</button>
+    </form>
+  </div>
+</body>
+</html>`;
+}
 
 app.get('/queue/dashboard', (req, res) => {
-  const auth = req.headers.authorization;
-  if (auth && auth.startsWith('Basic ')) {
-    const [user, pass] = Buffer.from(auth.slice(6), 'base64').toString().split(':');
-    if (user === DASHBOARD_USER && pass === DASHBOARD_PASS) {
-      return res.sendFile(path.join(__dirname, 'public/queue/dashboard.html'));
-    }
+  if (verifyToken(parseCookies(req)[DASHBOARD_COOKIE])) {
+    return res.sendFile(path.join(__dirname, 'public/queue/dashboard.html'));
   }
-  res.set('WWW-Authenticate', 'Basic realm="Dashboard"');
-  res.status(401).send('Unauthorised');
+  res.send(dashboardLoginPage(req.query.error === '1'));
+});
+
+app.post('/queue/dashboard/login', express.urlencoded({ extended: false }), (req, res) => {
+  const { username, password } = req.body;
+  if (username === DASHBOARD_USER && password === DASHBOARD_PASS) {
+    const token = signToken('ok');
+    res.set('Set-Cookie', `${DASHBOARD_COOKIE}=${token}; Path=/queue/dashboard; HttpOnly; SameSite=Strict; Max-Age=${8 * 3600}`);
+    return res.redirect('/queue/dashboard');
+  }
+  res.redirect('/queue/dashboard?error=1');
 });
 
 app.get('/api/services', (_req, res) => res.json(SERVICES));
