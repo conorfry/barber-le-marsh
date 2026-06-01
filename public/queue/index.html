@@ -332,6 +332,7 @@
   const WEBHOOK_URL = 'https://your-webhook-endpoint.example.com/queue';
 
   const CONFIRM_SECONDS = 300; // 5 minutes to confirm arrival
+  const DAILY_CAP       = 25;
 
   const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -363,7 +364,7 @@
   }
 
   // ── Live queue count indicator ────────────────────────────────────────────────
-  function updateQueueStatus(count) {
+  function updateQueueStatus(count, full) {
     const dot  = document.getElementById('status-dot');
     const text = document.getElementById('status-text');
     if (!dot || !text) return;
@@ -372,6 +373,13 @@
       dot.className  = 'queue-status-dot red';
       dot.style.animation = 'none';
       text.innerHTML = '<span class="red">Closed</span> — queue not available right now';
+      return;
+    }
+
+    if (full) {
+      dot.className  = 'queue-status-dot red';
+      dot.style.animation = 'none';
+      text.innerHTML = '<span class="red">Queue full</span> — no more spaces today';
       return;
     }
 
@@ -392,11 +400,23 @@
   }
 
   async function fetchQueueCount() {
-    const { count } = await db
-      .from('daily_queue')
-      .select('*', { count: 'exact', head: true })
-      .in('status', ['waiting', 'active']);
-    updateQueueStatus(count ?? 0);
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+
+    const [{ count: liveCount }, { count: dailyCount }] = await Promise.all([
+      db.from('daily_queue')
+        .select('*', { count: 'exact', head: true })
+        .in('status', ['waiting', 'active']),
+      db.from('daily_queue')
+        .select('*', { count: 'exact', head: true })
+        .gte('created_at', todayStart.toISOString()),
+    ]);
+
+    const full = (dailyCount ?? 0) >= DAILY_CAP;
+    updateQueueStatus(liveCount ?? 0, full);
+
+    const btn = document.getElementById('join-btn');
+    if (btn) btn.disabled = full;
   }
 
   fetchQueueCount();
@@ -448,6 +468,20 @@
 
     if (existing && existing.length > 0) {
       showError('This number is already in the queue today.');
+      btn.disabled = false;
+      btn.textContent = 'Join the List';
+      return;
+    }
+
+    btn.textContent = 'Checking…';
+
+    const { count: dailyCount } = await db
+      .from('daily_queue')
+      .select('*', { count: 'exact', head: true })
+      .gte('created_at', (() => { const d = new Date(); d.setHours(0,0,0,0); return d.toISOString(); })());
+
+    if ((dailyCount ?? 0) >= DAILY_CAP) {
+      showError("Sorry, today's queue is full. Please come back tomorrow.");
       btn.disabled = false;
       btn.textContent = 'Join the List';
       return;
