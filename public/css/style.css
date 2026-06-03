@@ -202,6 +202,8 @@ a   { color: inherit; text-decoration: none; }
   width: 780px;
   max-width: 90vw;
   margin: 0 auto;
+  filter: invert(1);
+  mix-blend-mode: screen;
 }
 .hero-ornament {
   display: flex;
