@@ -28,7 +28,7 @@
     <ul class="nav-links" id="nav-links">
       <li><a href="#services">Services</a></li>
       <li><a href="#hours">Hours</a></li>
-      <li><a href="/queue" class="nav-cta">Join Queue<span class="nav-queue-dot grey" id="nav-queue-dot"></span></a></li>
+      <li><a href="https://www.fresha.com/book-now/barber-le-marsh-nvpetmhn/all-offer?share=true&pId=2889970" class="nav-cta" target="_blank" rel="noopener">Book Now</a></li>
     </ul>
     <button class="nav-burger" id="nav-burger" aria-label="Open menu">
       <span></span><span></span><span></span>
@@ -48,12 +48,12 @@
   <div class="section-inner">
     <p class="section-label">The Menu</p>
     <h2 class="section-heading">Our Services</h2>
-    <p class="section-sub">Walk-ins welcome — no appointment needed</p>
+    <p class="section-sub">Walk-ins welcome — subject to availability</p>
     <div class="services-menu" id="services-menu">
       <p class="loading" style="border-top:1px solid var(--border);padding:24px 0">Loading…</p>
     </div>
     <div class="services-cta">
-      <a href="/queue" class="btn btn-red">Join the Virtual Queue</a>
+      <a href="https://www.fresha.com/book-now/barber-le-marsh-nvpetmhn/all-offer?share=true&pId=2889970" class="btn btn-red" target="_blank" rel="noopener">Book Now</a>
     </div>
   </div>
 </section>
@@ -130,7 +130,6 @@
   <div class="footer-inner">
     <p class="footer-brand">Barber le Marsh</p>
     <p class="footer-est">Established 2026 🇬🇧</p>
-    <a href="/queue/dashboard" class="footer-dashboard">Dashboard</a>
   </div>
 </footer>
 
@@ -188,41 +187,6 @@
   });
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-  const _db = supabase.createClient(
-    'https://isgtzoqtrirzxnyhsitv.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlzZ3R6b3F0cmlyenhueWhzaXR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyNDQ3OTgsImV4cCI6MjA5NTgyMDc5OH0.G3hiIyI7AOaA1CUnIM-KybkYZJrsCXLkmooiEpGpmU4'
-  );
-
-  function isShopOpen() {
-    const now = new Date();
-    const day  = now.getDay();
-    const mins = now.getHours() * 60 + now.getMinutes();
-    const isOpenDay = day === 0 || (day >= 2 && day <= 6);
-    return isOpenDay && mins >= 600 && mins < 1050; // 10:00–17:30
-  }
-
-  async function updateNavDot() {
-    const dot = document.getElementById('nav-queue-dot');
-    if (!dot) return;
-    if (!isShopOpen()) {
-      dot.className = 'nav-queue-dot grey';
-      return;
-    }
-    const { count } = await _db
-      .from('daily_queue')
-      .select('*', { count: 'exact', head: true })
-      .in('status', ['waiting', 'active']);
-    const n = count ?? 0;
-    dot.className = 'nav-queue-dot ' + (n <= 2 ? 'green' : n <= 5 ? 'amber' : 'red');
-  }
-
-  updateNavDot();
-  _db.channel('nav-dot')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'daily_queue' }, updateNavDot)
-    .subscribe();
-</script>
 
 </body>
 </html>
