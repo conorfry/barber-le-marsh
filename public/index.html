@@ -26,6 +26,7 @@
   <div class="nav-inner">
     <ul class="nav-links" id="nav-links">
       <li><a href="#services">Services</a></li>
+      <li><a href="#portfolio">Portfolio</a></li>
       <li><a href="#hours">Hours</a></li>
       <li><span class="nav-link-disabled">Shop</span></li>
       <li><a href="https://www.fresha.com/book-now/barber-le-marsh-nvpetmhn/all-offer?share=true&pId=2889970" class="nav-cta" target="_blank" rel="noopener">Book Now</a></li>
@@ -80,6 +81,29 @@
         <p class="review-author">— Dan R.</p>
       </div>
     </div>
+  </div>
+</section>
+
+
+<!-- Portfolio -->
+<section class="section section--dark" id="portfolio">
+  <div class="section-inner">
+    <p class="section-label">The Work</p>
+    <h2 class="section-heading">Portfolio</h2>
+    <p class="section-sub">A selection of cuts across hair types &amp; textures</p>
+    <div class="portfolio-carousel-wrap">
+      <button class="portfolio-btn portfolio-btn--prev" aria-label="Previous">&#8592;</button>
+      <div class="portfolio-track" id="portfolio-track">
+        <div class="portfolio-slide"><div class="portfolio-placeholder"><span>Photo coming soon</span></div></div>
+        <div class="portfolio-slide"><div class="portfolio-placeholder"><span>Photo coming soon</span></div></div>
+        <div class="portfolio-slide"><div class="portfolio-placeholder"><span>Photo coming soon</span></div></div>
+        <div class="portfolio-slide"><div class="portfolio-placeholder"><span>Photo coming soon</span></div></div>
+        <div class="portfolio-slide"><div class="portfolio-placeholder"><span>Photo coming soon</span></div></div>
+        <div class="portfolio-slide"><div class="portfolio-placeholder"><span>Photo coming soon</span></div></div>
+      </div>
+      <button class="portfolio-btn portfolio-btn--next" aria-label="Next">&#8594;</button>
+    </div>
+    <div class="portfolio-dots" id="portfolio-dots"></div>
   </div>
 </section>
 
@@ -163,6 +187,61 @@
     .catch(() => {
       document.getElementById('services-menu').innerHTML = '';
     });
+
+  // Portfolio carousel
+  (function () {
+    const track = document.getElementById('portfolio-track');
+    const dotsWrap = document.getElementById('portfolio-dots');
+    if (!track) return;
+    const slides = Array.from(track.querySelectorAll('.portfolio-slide'));
+    const prevBtn = document.querySelector('.portfolio-btn--prev');
+    const nextBtn = document.querySelector('.portfolio-btn--next');
+
+    function visibleCount() {
+      if (window.innerWidth <= 600) return 1;
+      if (window.innerWidth <= 900) return 2;
+      return 3;
+    }
+
+    const pageCount = () => Math.ceil(slides.length / visibleCount());
+
+    // Build dots
+    function buildDots() {
+      dotsWrap.innerHTML = '';
+      for (let i = 0; i < pageCount(); i++) {
+        const d = document.createElement('button');
+        d.className = 'portfolio-dot';
+        d.setAttribute('aria-label', 'Go to page ' + (i + 1));
+        d.addEventListener('click', () => goTo(i));
+        dotsWrap.appendChild(d);
+      }
+    }
+
+    function currentPage() {
+      const slideW = slides[0].offsetWidth + 16;
+      return Math.round(track.scrollLeft / (slideW * visibleCount()));
+    }
+
+    function goTo(page) {
+      const slideW = slides[0].offsetWidth + 16;
+      track.scrollTo({ left: page * slideW * visibleCount(), behavior: 'smooth' });
+    }
+
+    function updateUI() {
+      const page = currentPage();
+      document.querySelectorAll('.portfolio-dot').forEach((d, i) => d.classList.toggle('active', i === page));
+      if (prevBtn) prevBtn.disabled = page === 0;
+      if (nextBtn) nextBtn.disabled = page >= pageCount() - 1;
+    }
+
+    buildDots();
+    updateUI();
+
+    if (prevBtn) prevBtn.addEventListener('click', () => goTo(currentPage() - 1));
+    if (nextBtn) nextBtn.addEventListener('click', () => goTo(currentPage() + 1));
+    track.addEventListener('scroll', updateUI, { passive: true });
+    window.addEventListener('resize', () => { buildDots(); updateUI(); });
+  })();
 
   // Transparent nav → solid on scroll
   const nav = document.getElementById('nav');
