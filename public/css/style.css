@@ -82,6 +82,14 @@ a   { color: inherit; text-decoration: none; }
   transition: color .2s;
 }
 .nav-links a:hover { color: var(--cream); }
+.nav-link-disabled {
+  color: rgba(220,220,220,.25);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: default;
+}
 
 .nav-queue-dot {
   display: inline-block;
