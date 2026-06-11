@@ -198,11 +198,6 @@ a   { color: inherit; text-decoration: none; }
   pointer-events: none;
 }
 .hero > * { position: relative; z-index: 1; }
-.hero-logo {
-  width: 780px;
-  max-width: 90vw;
-  margin: 0 auto;
-}
 .hero-ornament {
   display: flex;
   align-items: center;
@@ -962,7 +957,6 @@ a   { color: inherit; text-decoration: none; }
   .nav-inner { justify-content: flex-end; }
   .shop-grid { grid-template-columns: repeat(2, 1fr); }
   .section { padding: 72px 20px; }
-  .hero-logo { width: 88vw; }
 }
 @media (max-width: 480px) {
   .step-header h2 { font-size: 22px; }
