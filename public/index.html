@@ -195,50 +195,45 @@
     const prevBtn = document.querySelector('.portfolio-btn--prev');
     const nextBtn = document.querySelector('.portfolio-btn--next');
 
-    function visibleCount() {
-      if (window.innerWidth <= 600) return 1;
-      if (window.innerWidth <= 900) return 2;
-      return 3;
+    function slideWidth() {
+      return slides[0].offsetWidth + 16;
     }
 
-    const pageCount = () => Math.ceil(slides.length / visibleCount());
+    function currentIndex() {
+      return Math.round(track.scrollLeft / slideWidth());
+    }
 
-    // Build dots
+    function goToIndex(idx) {
+      idx = Math.max(0, Math.min(idx, slides.length - 1));
+      track.scrollTo({ left: idx * slideWidth(), behavior: 'smooth' });
+    }
+
+    // Build one dot per slide
     function buildDots() {
       dotsWrap.innerHTML = '';
-      for (let i = 0; i < pageCount(); i++) {
+      slides.forEach((_, i) => {
         const d = document.createElement('button');
         d.className = 'portfolio-dot';
-        d.setAttribute('aria-label', 'Go to page ' + (i + 1));
-        d.addEventListener('click', () => goTo(i));
+        d.setAttribute('aria-label', 'Go to photo ' + (i + 1));
+        d.addEventListener('click', () => goToIndex(i));
         dotsWrap.appendChild(d);
-      }
-    }
-
-    function currentPage() {
-      const slideW = slides[0].offsetWidth + 16;
-      return Math.round(track.scrollLeft / (slideW * visibleCount()));
-    }
-
-    function goTo(page) {
-      const slideW = slides[0].offsetWidth + 16;
-      track.scrollTo({ left: page * slideW * visibleCount(), behavior: 'smooth' });
+      });
     }
 
     function updateUI() {
-      const page = currentPage();
-      document.querySelectorAll('.portfolio-dot').forEach((d, i) => d.classList.toggle('active', i === page));
-      if (prevBtn) prevBtn.disabled = page === 0;
-      if (nextBtn) nextBtn.disabled = page >= pageCount() - 1;
+      const idx = currentIndex();
+      document.querySelectorAll('.portfolio-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+      if (prevBtn) prevBtn.disabled = idx === 0;
+      if (nextBtn) nextBtn.disabled = idx >= slides.length - 1;
     }
 
     buildDots();
     updateUI();
 
-    if (prevBtn) prevBtn.addEventListener('click', () => goTo(currentPage() - 1));
-    if (nextBtn) nextBtn.addEventListener('click', () => goTo(currentPage() + 1));
+    if (prevBtn) prevBtn.addEventListener('click', () => goToIndex(currentIndex() - 1));
+    if (nextBtn) nextBtn.addEventListener('click', () => goToIndex(currentIndex() + 1));
     track.addEventListener('scroll', updateUI, { passive: true });
-    window.addEventListener('resize', () => { buildDots(); updateUI(); });
+    window.addEventListener('resize', updateUI);
   })();
 
   // Transparent nav → solid on scroll
