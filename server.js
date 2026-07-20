@@ -18,6 +18,7 @@ const SERVICES = [
   { id: 'bundle-style-beard',    name: 'Style Cut & Beard Trim +', price: 23.00, duration: 45, description: 'Any style cut with beard trim and hot towel razor line up on the neck and cheeks.' },
   { id: 'oap',                   name: 'OAP 67+',                  price: 12.00, duration: 20, description: 'Any service for those 67+.' },
   { id: 'single-length',         name: 'Single Length All Over',   price: 10.00, duration: 15, description: 'Single length all over.' },
+  { id: 'kids-cut',              name: 'Kids Cut',                 price: 12.00, duration: 20, description: 'Any haircut for younger children.' },
   { id: 'u16',                   name: '≤ U16 Haircut',            price: 15.00, duration: 25, description: 'Any haircut for those equal to or younger than 16 y/o.' },
   { id: 'short-back-sides',      name: 'Short Back & Sides',       price: 15.00, duration: 20, description: '1/2/3/4 back & sides with a trim on top.' },
   { id: 'style-cut',             name: 'Style Cut',                price: 17.00, duration: 30, description: 'Suitable for skin fade, taper, mullet, flow cut, crop, buzz-fade, afro, scissor cut.' },
