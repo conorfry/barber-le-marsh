@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shop | Barber le Marsh</title>
+  <meta name="description" content="Premium grooming products from Barber le Marsh — matte clay, curl cream, salt spray and texture dust. Coming soon.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .shop-hero {
+      background: var(--charcoal);
+      padding: calc(var(--nav-h) + 72px) 24px 72px;
+      text-align: center;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .shop-hero .section-label { margin-bottom: 14px; }
+    .shop-hero .section-heading { color: var(--cream); margin-bottom: 14px; }
+    .shop-hero .section-sub { color: rgba(220,220,220,.45); margin-bottom: 0; }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+      margin-top: 52px;
+    }
+    .product-card {
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 16px;
+      padding: 36px 28px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: border-color .25s, background .25s;
+    }
+    .product-card:hover {
+      background: rgba(255,255,255,.07);
+      border-color: rgba(255,255,255,.15);
+    }
+    .product-icon {
+      font-size: 36px;
+      line-height: 1;
+    }
+    .product-tag {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--red);
+    }
+    .product-name {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--cream);
+      line-height: 1.15;
+      letter-spacing: -.3px;
+    }
+    .product-desc {
+      font-size: 14px;
+      color: rgba(220,220,220,.5);
+      line-height: 1.65;
+      flex: 1;
+    }
+    .product-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255,255,255,.07);
+    }
+    .product-size {
+      font-size: 12px;
+      color: rgba(220,220,220,.3);
+      letter-spacing: .04em;
+    }
+    .product-badge {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba(220,220,220,.4);
+      border: 1px solid rgba(220,220,220,.15);
+      border-radius: 20px;
+      padding: 4px 12px;
+    }
+
+    .notify-section {
+      margin-top: 64px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.07);
+      border-radius: 16px;
+      padding: 40px 32px;
+      text-align: center;
+    }
+    .notify-heading {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--cream);
+      margin-bottom: 8px;
+    }
+    .notify-sub {
+      font-size: 14px;
+      color: rgba(220,220,220,.4);
+      margin-bottom: 24px;
+    }
+    .notify-form {
+      display: flex;
+      gap: 10px;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+    .notify-input {
+      flex: 1;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 8px;
+      padding: 13px 16px;
+      color: var(--cream);
+      font-size: 14px;
+      font-family: var(--sans);
+      outline: none;
+      transition: border-color .2s;
+    }
+    .notify-input::placeholder { color: rgba(220,220,220,.25); }
+    .notify-input:focus { border-color: rgba(255,255,255,.3); }
+    .notify-btn {
+      background: #012169;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 13px 22px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: .05em;
+      cursor: pointer;
+      font-family: var(--sans);
+      white-space: nowrap;
+      transition: background .2s;
+    }
+    .notify-btn:hover { background: #011247; }
+    .notify-thanks {
+      display: none;
+      font-size: 14px;
+      color: rgba(220,220,220,.5);
+      margin-top: 12px;
+    }
+
+    @media (max-width: 640px) {
+      .product-grid { grid-template-columns: 1fr; }
+      .notify-form { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav scrolled" id="nav">
+  <div class="nav-inner">
+    <ul class="nav-links" id="nav-links">
+      <li><a href="/#services">Services</a></li>
+      <li><a href="/#hours">Hours</a></li>
+      <li><a href="/shop.html" style="color:var(--cream)">Shop</a></li>
+      <li><a href="https://www.fresha.com/book-now/barber-le-marsh-nvpetmhn/all-offer?share=true&pId=2889970" class="nav-cta" target="_blank" rel="noopener">Book Now</a></li>
+    </ul>
+    <button class="nav-burger" id="nav-burger" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<div class="shop-hero">
+  <div class="section-inner">
+    <p class="section-label">Barber le Marsh</p>
+    <h1 class="section-heading">The Range</h1>
+    <p class="section-sub">Premium grooming products — coming soon</p>
+  </div>
+</div>
+
+<section class="section section--dark">
+  <div class="section-inner">
+
+    <div class="product-grid">
+
+      <div class="product-card">
+        <div class="product-icon">🫙</div>
+        <p class="product-tag">Clay</p>
+        <h2 class="product-name">Dry Matte Clay</h2>
+        <p class="product-desc">Medium-strong hold with a clean matte finish. Workable all day — ideal for skin fades, textured crops, tapers and everything in between.</p>
+        <div class="product-footer">
+          <span class="product-size">100ml</span>
+          <span class="product-badge">Coming Soon</span>
+        </div>
+      </div>
+
+      <div class="product-card">
+        <div class="product-icon">🌀</div>
+        <p class="product-tag">Curl Cream</p>
+        <h2 class="product-name">Curl &amp; Define Cream</h2>
+        <p class="product-desc">Lightweight hold with moisture and definition. Enhances natural curl and wave without crunch — for coils, curls and wavy texture.</p>
+        <div class="product-footer">
+          <span class="product-size">100ml</span>
+          <span class="product-badge">Coming Soon</span>
+        </div>
+      </div>
+
+      <div class="product-card">
+        <div class="product-icon">🌊</div>
+        <p class="product-tag">Spray</p>
+        <h2 class="product-name">Sea Salt Spray</h2>
+        <p class="product-desc">Adds natural texture, volume and a lived-in finish. Use as a base layer before clay or wear it alone for effortless, undone style.</p>
+        <div class="product-footer">
+          <span class="product-size">250ml</span>
+          <span class="product-badge">Coming Soon</span>
+        </div>
+      </div>
+
+      <div class="product-card">
+        <div class="product-icon">✨</div>
+        <p class="product-tag">Dust</p>
+        <h2 class="product-name">Texture Dust</h2>
+        <p class="product-desc">A fine volumising dust that adds grip, lift and matteness at the roots. The professional secret weapon — a little goes a long way.</p>
+        <div class="product-footer">
+          <span class="product-size">20g</span>
+          <span class="product-badge">Coming Soon</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="notify-section">
+      <p class="notify-heading">Be the first to know</p>
+      <p class="notify-sub">Drop your email and we'll let you know when the range lands.</p>
+      <div class="notify-form">
+        <input class="notify-input" type="email" placeholder="your@email.com" id="notify-email">
+        <button class="notify-btn" onclick="submitNotify()">Notify Me</button>
+      </div>
+      <p class="notify-thanks" id="notify-thanks">Done — we'll be in touch. ✓</p>
+    </div>
+
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <p class="footer-brand">Barber le Marsh</p>
+    <p class="footer-est">Established 2026 🇬🇧</p>
+  </div>
+</footer>
+
+<script>
+  const burger   = document.getElementById('nav-burger');
+  const navLinks = document.getElementById('nav-links');
+  burger.addEventListener('click', () => {
+    const open = navLinks.classList.toggle('is-open');
+    burger.classList.toggle('is-open', open);
+    burger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+  });
+  navLinks.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => {
+      navLinks.classList.remove('is-open');
+      burger.classList.remove('is-open');
+    });
+  });
+
+  function submitNotify() {
+    const email = document.getElementById('notify-email').value.trim();
+    if (!email || !email.includes('@')) return;
+    document.getElementById('notify-email').disabled = true;
+    document.querySelector('.notify-btn').disabled = true;
+    document.getElementById('notify-thanks').style.display = 'block';
+  }
+</script>
+
+</body>
+</html>
