@@ -19,8 +19,8 @@ const SERVICES = [
   { id: 'oap',                   name: 'OAP 67+',                  price: 12.00, duration: 20, description: 'For those 67 and over, any service at a reduced rate.' },
   { id: 'single-length',         name: 'Single Length All Over',   price: 10.00, duration: 15, description: 'Single length all over.' },
   { id: 'kids-cut',              name: 'Kids Cut',                 price: 12.00, duration: 20, description: 'A neat, fuss-free cut for the little ones.' },
-  { id: 'short-back-sides',      name: 'Short Back & Sides',       price: 15.00, duration: 20, description: '1/2/3/4 back & sides with a trim on top.' },
-  { id: 'style-cut',             name: 'Style Cut',                price: 17.00, duration: 30, description: 'Suitable for skin fade, taper, mullet, flow cut, crop, buzz-fade, afro, scissor cut.' },
+  { id: 'short-back-sides',      name: 'Short Back & Sides',       price: 14.00, duration: 20, description: '1/2/3/4 back & sides with a trim on top.' },
+  { id: 'style-cut',             name: 'Style Cut',                price: 16.00, duration: 30, description: 'Suitable for skin fade, taper, mullet, flow cut, crop, buzz-fade, afro, scissor cut.' },
   { id: 'beard-trim',            name: 'Beard Trim',               price: 6.00,  duration: 10, description: 'Any beard trim with just clippers/foiler.' },
   { id: 'beard-trim-plus',       name: 'Beard Trim +',             price: 8.00,  duration: 15, description: "Beard trim with a hot towel razored 'line-up'." },
 ];
