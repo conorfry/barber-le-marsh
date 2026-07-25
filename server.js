@@ -17,7 +17,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 const SERVICES = [
   { id: 'bundle-style-beard',    name: 'Style Cut & Beard Trim +', price: 23.00, duration: 45, description: 'Any style cut with beard trim and hot towel razor line up on the neck and cheeks.' },
   { id: 'oap',                   name: 'OAP 67+',                  price: 12.00, duration: 20, description: 'For those 67 and over, any service at a reduced rate.' },
-  { id: 'single-length',         name: 'Single Length All Over',   price: 10.00, duration: 15, description: 'Single length all over.' },
+  { id: 'single-length',         name: 'Single Length All Over',   price: 7.00, duration: 15, description: 'Single length all over.' },
   { id: 'kids-cut',              name: 'Kids Cut',                 price: 12.00, duration: 20, description: 'A neat, fuss-free cut for the little ones.' },
   { id: 'short-back-sides',      name: 'Short Back & Sides',       price: 14.00, duration: 20, description: '1/2/3/4 back & sides with a trim on top.' },
   { id: 'style-cut',             name: 'Style Cut',                price: 16.00, duration: 30, description: 'Suitable for skin fade, taper, mullet, flow cut, crop, buzz-fade, afro, scissor cut.' },
