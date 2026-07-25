@@ -522,42 +522,6 @@ a   { color: inherit; text-decoration: none; }
   border-radius: var(--radius-lg);
 }
 
-/* ── Reviews ───────────────────────────────────────── */
-.reviews-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 28px;
-  margin-top: 48px;
-}
-.review-card {
-  background: var(--cream);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 32px 28px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-.review-stars {
-  color: #C9A227;
-  font-size: 18px;
-  letter-spacing: 2px;
-}
-.review-text {
-  font-size: 15px;
-  line-height: 1.65;
-  color: var(--charcoal);
-  flex: 1;
-}
-.review-author {
-  font-size: 13px;
-  color: var(--warm-grey);
-  font-weight: 500;
-}
-@media (max-width: 768px) {
-  .reviews-grid { grid-template-columns: 1fr; }
-}
-
 /* ── Portfolio Carousel ─────────────────────────────── */
 .portfolio-carousel-wrap {
   position: relative;
