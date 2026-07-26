@@ -15,22 +15,20 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 const SERVICES = [
-  { id: 'bundle-style-beard',    name: 'Style Cut & Beard Trim +', price: 23.00, duration: 45, description: 'Any style cut with beard trim and hot towel razor line up on the neck and cheeks.' },
-  { id: 'oap',                   name: 'OAP 67+',                  price: 12.00, duration: 20, description: 'For those 67 and over, any service at a reduced rate.' },
-  { id: 'single-length',         name: 'Single Length All Over',   price: 10.00, duration: 15, description: 'Single length all over.' },
-  { id: 'kids-cut',              name: 'Kids Cut',                 price: 12.00, duration: 20, description: 'A neat, fuss-free cut for the little ones.' },
+  { id: 'bundle-style-beard',    name: 'Style Cut & Beard Trim',   price: 20.00, duration: 40, description: 'Any style cut with beard trim with razor line up.' },
+  { id: 'oap',                   name: 'OAP 67+',                  price: 12.00, duration: 20, description: 'Any service for those 67+.' },
+  { id: 'single-length',         name: 'Single Length All Over',   price: 7.00,  duration: 15, description: 'Single length all over.' },
+  { id: 'kids-cut',              name: 'Kids Cut',                 price: 12.00, duration: 20, description: 'Any haircut for those equal to or younger than 13 y/o.' },
   { id: 'short-back-sides',      name: 'Short Back & Sides',       price: 14.00, duration: 20, description: '1/2/3/4 back & sides with a trim on top.' },
   { id: 'style-cut',             name: 'Style Cut',                price: 16.00, duration: 30, description: 'Suitable for skin fade, taper, mullet, flow cut, crop, buzz-fade, afro, scissor cut.' },
   { id: 'beard-trim',            name: 'Beard Trim',               price: 6.00,  duration: 10, description: 'Any beard trim with just clippers/foiler.' },
-  { id: 'beard-trim-plus',       name: 'Beard Trim +',             price: 8.00,  duration: 15, description: "Beard trim with a hot towel razored 'line-up'." },
 ];
 
 // Keyed by JS day-of-week (0=Sun). Days absent = closed.
 const OPENING_HOURS = {
-  0: { open: '10:00', close: '18:00' }, // Sunday
-  2: { open: '10:00', close: '18:00' }, // Tuesday
+  0: { open: '10:00', close: '14:00' }, // Sunday
   3: { open: '10:00', close: '18:00' }, // Wednesday
-  4: { open: '10:00', close: '18:00' }, // Thursday
+  4: { open: '12:00', close: '20:00' }, // Thursday
   5: { open: '10:00', close: '18:00' }, // Friday
   6: { open: '10:00', close: '18:00' }, // Saturday
 };
