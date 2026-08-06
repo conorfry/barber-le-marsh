@@ -325,6 +325,7 @@ a   { color: inherit; text-decoration: none; }
 .section--dark .section-heading { color: var(--cream); }
 .section--dark .section-sub { color: rgba(220,220,220,.45); }
 .section-inner { max-width: 960px; margin: 0 auto; }
+.section-inner--centered { text-align: center; }
 .section-inner--row {
   display: grid;
   grid-template-columns: 1fr 140px;
@@ -353,6 +354,62 @@ a   { color: inherit; text-decoration: none; }
   font-size: 15px;
   color: var(--warm-grey);
   margin-bottom: 52px;
+}
+
+/* ── Gift Cards ─────────────────────────────────────── */
+.gift-card-visual {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 300px;
+  height: 180px;
+  margin: 0 auto 44px;
+  background: var(--charcoal);
+  border-radius: 14px;
+  padding: 28px 28px 24px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.18);
+  position: relative;
+  overflow: hidden;
+}
+.gift-card-visual::before {
+  content: '';
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: var(--red);
+  opacity: .15;
+  top: -80px;
+  right: -60px;
+  pointer-events: none;
+}
+.gift-card-logo {
+  height: 44px;
+  width: auto;
+  position: relative;
+  z-index: 1;
+}
+.gift-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+.gift-card-tag {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: rgba(220,220,220,.4);
+}
+.gift-card-amounts {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  color: rgba(220,220,220,.55);
 }
 
 /* ── Services menu (homepage) ──────────────────────── */
