@@ -44,7 +44,7 @@ a   { color: inherit; text-decoration: none; }
   top: 0; left: 0; right: 0;
   z-index: 100;
   height: var(--nav-h);
-  background: transparent;
+  background: linear-gradient(to bottom, rgba(0,0,0,.55) 0%, rgba(0,0,0,.55) 75%, rgba(0,0,0,0) 100%);
   border-bottom: 1px solid transparent;
   transition: background .4s ease, border-color .4s ease;
 }
@@ -462,12 +462,6 @@ a   { color: inherit; text-decoration: none; }
   font-weight: 700;
   color: var(--charcoal);
 }
-.service-row-save {
-  font-size: 12px;
-  font-weight: 600;
-  color: #2a7a3b;
-  margin-left: 6px;
-}
 .services-cta {
   margin-top: 52px;
   display: flex;
@@ -676,11 +670,16 @@ a   { color: inherit; text-decoration: none; }
 /* ── Reviews ───────────────────────────────────────── */
 .reviews-grid {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 28px;
+  gap: 20px;
   margin-top: 48px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 6px;
 }
+.reviews-grid::-webkit-scrollbar { display: none; }
 .review-card {
   background: var(--cream);
   border: 1px solid var(--border);
@@ -689,8 +688,8 @@ a   { color: inherit; text-decoration: none; }
   display: flex;
   flex-direction: column;
   gap: 16px;
-  flex: 1 1 320px;
-  max-width: 380px;
+  flex: 0 0 340px;
+  scroll-snap-align: start;
 }
 .review-stars {
   color: #C9A227;
@@ -709,7 +708,7 @@ a   { color: inherit; text-decoration: none; }
   font-weight: 500;
 }
 @media (max-width: 768px) {
-  .review-card { flex-basis: 100%; max-width: 100%; }
+  .review-card { flex-basis: 85%; }
 }
 
 /* ── Instagram ──────────────────────────────────────── */

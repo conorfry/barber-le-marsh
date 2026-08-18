@@ -221,13 +221,38 @@
     <div class="reviews-grid">
       <div class="review-card">
         <div class="review-stars">★★★★★</div>
-        <p class="review-text">"Excellent 5 star service from Connor at Barber le Marsh. I was apparently his 5th haircut of the day on his 1st day of business. I wish him well on his new venture being just what the village needed and shall definitely be using his services again."</p>
-        <p class="review-author">— Stephen H., Google Review</p>
+        <p class="review-text">"My little brother had his hair cut, he loved it. Connor (the barber) was so talkative and the shop was clean — amazing experience and a happy, chill atmosphere. 100% recommended if you need a barber and you're nearby."</p>
+        <p class="review-author">— Calvin G., Google Review</p>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"Excellent service, very professional, would highly recommend."</p>
+        <p class="review-author">— Dave W., Google Review</p>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"Great service."</p>
+        <p class="review-author">— Peter P., Google Review</p>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"Top barber…"</p>
+        <p class="review-author">— Wreide P., Google Review</p>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"Connor has done a fantastic job opening this barber shop in Burgh le Marsh. From the moment I arrived, he was friendly, welcoming and professional. My haircut was excellent, with great attention to detail. I booked through his easy-to-use online booking system, but I'm sure you can also pop in and wait if he's available, making it really convenient. Wishing Connor every success with his new business."</p>
+        <p class="review-author">— Gary M., Google Review</p>
       </div>
       <div class="review-card">
         <div class="review-stars">★★★★★</div>
         <p class="review-text">"Took my son who has ADHD/autism for a buzz cut, he was amazing with him, absolutely lovely bloke. My son was a very happy lad with his cut and my 2 other sons will be going for theirs too. Highly recommended, prices are very good."</p>
         <p class="review-author">— J. Bryan, Google Review</p>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"Excellent 5 star service from Connor at Barber le Marsh. I was apparently his 5th haircut of the day on his 1st day of business. I wish him well on his new venture, being just what the village needs, and shall definitely be using his services again."</p>
+        <p class="review-author">— Stephen H., Google Review</p>
       </div>
     </div>
   </div>
@@ -408,9 +433,8 @@
   fetch('/api/services')
     .then(r => r.json())
     .then(services => {
-      const bundles = services.filter(s => s.id.startsWith('bundle')).sort((a, b) => a.price - b.price);
-      const hair    = services.filter(s => !s.id.startsWith('bundle') && !s.id.startsWith('beard')).sort((a, b) => a.price - b.price);
-      const beard   = services.filter(s => s.id.startsWith('beard')).sort((a, b) => a.price - b.price);
+      const hair  = services.filter(s => !s.id.startsWith('bundle') && !s.id.startsWith('beard')).sort((a, b) => a.price - b.price);
+      const beard = services.filter(s => s.id.startsWith('beard')).sort((a, b) => a.price - b.price);
 
       const renderGroup = (title, items) => `
         <p class="services-group-label">${title}</p>
@@ -422,14 +446,14 @@
             </div>
             <div class="service-row-right">
               <span class="service-row-dur">${s.duration} min</span>
-              <span class="service-row-price">£${s.price.toFixed(2)}${s.id.startsWith('bundle') ? ' <span class="service-row-save">Save 8%</span>' : ''}</span>
+              <span class="service-row-price">£${s.price.toFixed(2)}</span>
             </div>
           </div>
         `).join('')}
       `;
 
       document.getElementById('services-menu').innerHTML =
-        renderGroup('Hair & Styling', hair) + renderGroup('Beard', beard) + renderGroup('Bundles', bundles);
+        renderGroup('Hair & Styling', hair) + renderGroup('Beard', beard);
     })
     .catch(() => {
       document.getElementById('services-menu').innerHTML = '';
