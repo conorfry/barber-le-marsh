@@ -15,6 +15,7 @@
   --warm-grey:  #7A7A7A;
   --border:     #CCCCCC;
   --border-lt:  #E8E8E8;
+  --fresha-accent: #5B4FE5;
   --serif:      'DM Sans', system-ui, sans-serif;
   --sans:       'DM Sans', system-ui, sans-serif;
   --script:     'Dancing Script', cursive;
@@ -580,46 +581,80 @@ a   { color: inherit; text-decoration: none; }
   border-radius: var(--radius-lg);
 }
 
-/* ── Week Availability ──────────────────────────────── */
+/* ── Week Availability (Fresha-style date strip) ──────── */
+.week-select-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 40px;
+}
+.week-select-label {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--charcoal);
+}
+.week-chevrons { display: flex; gap: 2px; }
+.week-chevron {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--charcoal);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .15s;
+}
+.week-chevron:hover:not(:disabled) { background: rgba(0,0,0,.06); }
+.week-chevron:disabled { color: var(--border); cursor: default; }
 .week-strip {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 10px;
-  margin-top: 40px;
+  gap: 8px;
+  margin-top: 16px;
+  touch-action: pan-y;
 }
 .week-card {
   background: #fff;
-  border: 1px solid var(--border-lt);
-  border-top: 3px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 18px 6px;
+  border-radius: 18px;
+  padding: 14px 4px 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 1px;
   text-align: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,.05);
 }
-.week-card-day  { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--charcoal); }
-.week-card-date { font-size: 12px; color: var(--warm-grey); margin-top: -4px; }
+.week-card-weekday { font-size: 12px; font-weight: 600; color: var(--warm-grey); }
+.week-card-daynum  { font-size: 26px; font-weight: 800; color: var(--charcoal); line-height: 1.15; margin: 1px 0; }
+.week-card-month   { font-size: 11px; color: var(--warm-grey); margin-bottom: 8px; }
+.week-card-hours   { font-size: 11px; color: var(--warm-grey); margin-bottom: 8px; }
 .week-card-badge {
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 600;
-  padding: 4px 10px;
+  padding: 4px 9px;
   border-radius: 20px;
   white-space: nowrap;
 }
 .week-card-badge--link { cursor: pointer; transition: filter .15s; }
 .week-card-badge--link:hover { filter: brightness(0.92); }
-.week-card--open     { border-top-color: #2f8f4e; }
 .week-card--open     .week-card-badge { background: #e7f6ec; color: #1f7a3a; }
-.week-card--limited  { border-top-color: #c48a1a; }
 .week-card--limited  .week-card-badge { background: #fbf0dc; color: #9a6a10; }
-.week-card--full     { border-top-color: var(--warm-grey); }
 .week-card--full     .week-card-badge { background: var(--cream-alt); color: var(--warm-grey); }
-.week-card--walkin   { border-top-color: var(--red); }
 .week-card--walkin   .week-card-badge { background: var(--red-lt); color: var(--red-dk); }
 .week-card--closed   { opacity: .5; }
-.week-card--closed   .week-card-badge { background: var(--cream-alt); color: var(--warm-grey); }
+/* "Today" — highlighted like Fresha's selected date */
+.week-card--today {
+  background: var(--fresha-accent);
+  box-shadow: 0 4px 14px rgba(91,79,229,.35);
+}
+.week-card--today .week-card-weekday,
+.week-card--today .week-card-daynum,
+.week-card--today .week-card-month { color: #fff; }
+.week-card--today .week-card-hours { color: rgba(255,255,255,.75); }
+.week-card--today .week-card-badge { background: rgba(255,255,255,.2); color: #fff; }
 .week-legend {
   display: flex;
   flex-wrap: wrap;

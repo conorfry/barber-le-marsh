@@ -171,6 +171,18 @@
     <p class="section-label">This Week</p>
     <h2 class="section-heading">Availability at a Glance</h2>
     <p class="section-sub">Book online Friday &amp; Saturday — walk-ins welcome Tuesday to Saturday.</p>
+
+    <div class="week-select-row">
+      <p class="week-select-label" id="week-range">This Week</p>
+      <div class="week-chevrons">
+        <button class="week-chevron" id="week-prev" aria-label="Previous week" disabled>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button class="week-chevron" id="week-next" aria-label="Next week">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+    </div>
     <div class="week-strip" id="week-strip">
       <p class="loading" style="padding:24px 0">Loading…</p>
     </div>
@@ -312,40 +324,85 @@
 </footer>
 
 <script>
-  // Load week-ahead availability strip
-  fetch('/api/week-availability')
-    .then(r => r.json())
-    .then(({ days }) => {
-      const BOOK_URL = 'https://www.fresha.com/book-now/barber-le-marsh-nvpetmhn/all-offer?share=true&pId=2889970';
-      const fmtDate = d => new Date(d + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  // Load week-ahead availability strip — paged by week, swipeable on touch
+  (function () {
+    const BOOK_URL = 'https://www.fresha.com/book-now/barber-le-marsh-nvpetmhn/all-offer?share=true&pId=2889970';
+    const STATUS = {
+      open:    { label: 'Book online',  cls: 'open' },
+      limited: { label: 'Filling up',   cls: 'limited' },
+      full:    { label: 'Fully booked', cls: 'full' },
+      walkin:  { label: 'Walk-in only', cls: 'walkin' },
+      closed:  { label: 'Closed',       cls: 'closed' },
+    };
+    const fmtDate = d => new Date(d + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 
-      const STATUS = {
-        open:    { label: 'Book online',  cls: 'open' },
-        limited: { label: 'Filling up',   cls: 'limited' },
-        full:    { label: 'Fully booked', cls: 'full' },
-        walkin:  { label: 'Walk-in only', cls: 'walkin' },
-        closed:  { label: 'Closed',       cls: 'closed' },
-      };
+    const strip   = document.getElementById('week-strip');
+    const range   = document.getElementById('week-range');
+    const prevBtn = document.getElementById('week-prev');
+    const nextBtn = document.getElementById('week-next');
+    if (!strip) return;
 
-      document.getElementById('week-strip').innerHTML = days.map((d, i) => {
-        const dayLabel = i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : d.weekday.slice(0, 3);
+    let offset = 0, maxOffset = 0, loading = false;
+
+    function render(days) {
+      strip.innerHTML = days.map((d, i) => {
+        const dateObj = new Date(d.date + 'T12:00:00');
+        const isToday = offset === 0 && i === 0;
         const key = d.type === 'bookable' ? d.status : d.type;
         const { label, cls } = STATUS[key];
         const clickable = d.type === 'bookable' && d.status !== 'full';
-        const badge = clickable
-          ? `<a href="${BOOK_URL}" target="_blank" rel="noopener" class="week-card-badge week-card-badge--link">${label}</a>`
-          : `<span class="week-card-badge">${label}</span>`;
+        const hoursText = d.type === 'closed' ? 'Closed' : `${d.hours.open}–${d.hours.close}`;
+        const badge = d.type === 'closed' ? ''
+          : clickable
+            ? `<a href="${BOOK_URL}" target="_blank" rel="noopener" class="week-card-badge week-card-badge--link">${label}</a>`
+            : `<span class="week-card-badge">${label}</span>`;
         return `
-          <div class="week-card week-card--${cls}">
-            <p class="week-card-day">${dayLabel}</p>
-            <p class="week-card-date">${fmtDate(d.date)}</p>
+          <div class="week-card week-card--${cls}${isToday ? ' week-card--today' : ''}">
+            <p class="week-card-weekday">${d.weekday.slice(0, 3)}</p>
+            <p class="week-card-daynum">${dateObj.getDate()}</p>
+            <p class="week-card-month">${dateObj.toLocaleDateString('en-GB', { month: 'short' })}</p>
+            <p class="week-card-hours">${hoursText}</p>
             ${badge}
           </div>`;
       }).join('');
-    })
-    .catch(() => {
-      document.getElementById('week-strip').innerHTML = '<p class="loading" style="padding:24px 0">Availability unavailable right now.</p>';
-    });
+
+      range.textContent = offset === 0 ? 'This Week' : `${fmtDate(days[0].date)} – ${fmtDate(days[6].date)}`;
+      prevBtn.disabled = offset === 0;
+      nextBtn.disabled = offset >= maxOffset;
+    }
+
+    function loadWeek(newOffset) {
+      if (loading || newOffset < 0) return;
+      loading = true;
+      fetch(`/api/week-availability?offset=${newOffset}`)
+        .then(r => r.json())
+        .then(({ days, offset: o, maxOffset: m }) => {
+          offset = o;
+          maxOffset = m;
+          render(days);
+        })
+        .catch(() => {
+          strip.innerHTML = '<p class="loading" style="padding:24px 0">Availability unavailable right now.</p>';
+        })
+        .finally(() => { loading = false; });
+    }
+
+    prevBtn.addEventListener('click', () => loadWeek(offset - 1));
+    nextBtn.addEventListener('click', () => loadWeek(offset + 1));
+
+    // Swipe left/right on touch devices to page between weeks
+    let touchStartX = null;
+    strip.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+    strip.addEventListener('touchend', e => {
+      if (touchStartX === null) return;
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      touchStartX = null;
+      if (Math.abs(dx) < 40) return;
+      loadWeek(dx < 0 ? offset + 1 : offset - 1);
+    }, { passive: true });
+
+    loadWeek(0);
+  })();
 
   // Load services into homepage menu
   fetch('/api/services')

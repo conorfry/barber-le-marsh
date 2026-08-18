@@ -310,7 +310,10 @@ app.get('/api/availability', (req, res) => {
   res.json({ available: true, slots, hours });
 });
 
-app.get('/api/week-availability', async (_req, res) => {
+const MAX_WEEK_OFFSET = 4; // how many weeks ahead the homepage strip can page into
+
+app.get('/api/week-availability', async (req, res) => {
+  const offset = Math.min(MAX_WEEK_OFFSET, Math.max(0, parseInt(req.query.offset, 10) || 0));
   const busyByDate = await getBusyByDate();
   const today = londonParts(new Date()).date;
   const minDuration = Math.min(...SERVICES.map(s => s.duration));
@@ -319,7 +322,7 @@ app.get('/api/week-availability', async (_req, res) => {
   for (let i = 0; i < 7; i++) {
     const [y, mo, d] = today.split('-').map(Number);
     const anchor = new Date(Date.UTC(y, mo - 1, d, 12)); // noon UTC avoids DST edge cases
-    anchor.setUTCDate(anchor.getUTCDate() + i);
+    anchor.setUTCDate(anchor.getUTCDate() + offset * 7 + i);
     const date = `${anchor.getUTCFullYear()}-${String(anchor.getUTCMonth() + 1).padStart(2, '0')}-${String(anchor.getUTCDate()).padStart(2, '0')}`;
     const weekday = anchor.getUTCDay();
     const hours = OPENING_HOURS[weekday];
@@ -345,7 +348,7 @@ app.get('/api/week-availability', async (_req, res) => {
     days.push({ date, weekday: DAY_NAMES[weekday], type: 'bookable', hours, status, freeSlots: free, totalSlots: total });
   }
 
-  res.json({ days, live: !!CALENDAR_ICS_URL });
+  res.json({ days, live: !!CALENDAR_ICS_URL, offset, maxOffset: MAX_WEEK_OFFSET });
 });
 
 app.post('/api/bookings', (req, res) => {
