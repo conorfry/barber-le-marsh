@@ -331,14 +331,15 @@
         const dayLabel = i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : d.weekday.slice(0, 3);
         const key = d.type === 'bookable' ? d.status : d.type;
         const { label, cls } = STATUS[key];
-        const cta = d.type === 'bookable' && d.status !== 'full'
-          ? `<a href="${BOOK_URL}" target="_blank" rel="noopener" class="week-card-cta">Book</a>` : '';
+        const clickable = d.type === 'bookable' && d.status !== 'full';
+        const badge = clickable
+          ? `<a href="${BOOK_URL}" target="_blank" rel="noopener" class="week-card-badge week-card-badge--link">${label}</a>`
+          : `<span class="week-card-badge">${label}</span>`;
         return `
           <div class="week-card week-card--${cls}">
             <p class="week-card-day">${dayLabel}</p>
             <p class="week-card-date">${fmtDate(d.date)}</p>
-            <span class="week-card-badge">${label}</span>
-            ${cta}
+            ${badge}
           </div>`;
       }).join('');
     })

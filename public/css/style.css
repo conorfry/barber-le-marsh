@@ -608,12 +608,8 @@ a   { color: inherit; text-decoration: none; }
   border-radius: 20px;
   white-space: nowrap;
 }
-.week-card-cta {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--red);
-}
-.week-card-cta:hover { text-decoration: underline; }
+.week-card-badge--link { cursor: pointer; transition: filter .15s; }
+.week-card-badge--link:hover { filter: brightness(0.92); }
 .week-card--open     { border-top-color: #2f8f4e; }
 .week-card--open     .week-card-badge { background: #e7f6ec; color: #1f7a3a; }
 .week-card--limited  { border-top-color: #c48a1a; }
