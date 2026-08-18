@@ -580,6 +580,68 @@ a   { color: inherit; text-decoration: none; }
   border-radius: var(--radius-lg);
 }
 
+/* ── Week Availability ──────────────────────────────── */
+.week-strip {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+  margin-top: 40px;
+}
+.week-card {
+  background: #fff;
+  border: 1px solid var(--border-lt);
+  border-top: 3px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+.week-card-day  { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--charcoal); }
+.week-card-date { font-size: 12px; color: var(--warm-grey); margin-top: -4px; }
+.week-card-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.week-card-cta {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--red);
+}
+.week-card-cta:hover { text-decoration: underline; }
+.week-card--open     { border-top-color: #2f8f4e; }
+.week-card--open     .week-card-badge { background: #e7f6ec; color: #1f7a3a; }
+.week-card--limited  { border-top-color: #c48a1a; }
+.week-card--limited  .week-card-badge { background: #fbf0dc; color: #9a6a10; }
+.week-card--full     { border-top-color: var(--warm-grey); }
+.week-card--full     .week-card-badge { background: var(--cream-alt); color: var(--warm-grey); }
+.week-card--walkin   { border-top-color: var(--red); }
+.week-card--walkin   .week-card-badge { background: var(--red-lt); color: var(--red-dk); }
+.week-card--closed   { opacity: .5; }
+.week-card--closed   .week-card-badge { background: var(--cream-alt); color: var(--warm-grey); }
+.week-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin-top: 28px;
+  font-size: 13px;
+  color: var(--warm-grey);
+}
+.week-legend-item { display: inline-flex; align-items: center; gap: 6px; }
+.week-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.week-dot--open    { background: #2f8f4e; }
+.week-dot--limited { background: #c48a1a; }
+.week-dot--full    { background: var(--warm-grey); }
+.week-dot--walkin  { background: var(--red); }
+@media (max-width: 700px) {
+  .week-strip { grid-template-columns: repeat(3, 1fr); }
+}
+
 /* ── Reviews ───────────────────────────────────────── */
 .reviews-grid {
   display: flex;
@@ -619,103 +681,12 @@ a   { color: inherit; text-decoration: none; }
   .review-card { flex-basis: 100%; max-width: 100%; }
 }
 
-/* ── Portfolio Carousel ─────────────────────────────── */
-.portfolio-carousel-wrap {
-  position: relative;
-  display: flex;
+/* ── Instagram ──────────────────────────────────────── */
+.instagram-follow-btn {
+  display: inline-flex;
   align-items: center;
-  gap: 16px;
-  margin-top: 40px;
-}
-.portfolio-track {
-  display: flex;
-  gap: 16px;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  flex: 1;
-}
-.portfolio-track::-webkit-scrollbar { display: none; }
-.portfolio-slide {
-  flex: 0 0 calc((100% - 16px) / 2);
-  scroll-snap-align: start;
-  aspect-ratio: 3 / 4;
-  border-radius: 8px;
-  overflow: hidden;
-  background: var(--charcoal-2);
-}
-.portfolio-slide img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  transition: transform .4s ease;
-}
-.portfolio-slide:hover img { transform: scale(1.04); }
-.portfolio-placeholder {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px dashed rgba(255,255,255,.12);
-  border-radius: 8px;
-}
-.portfolio-placeholder span {
-  font-size: 11px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: rgba(220,220,220,.2);
-}
-.portfolio-btn {
-  flex-shrink: 0;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: 1px solid rgba(255,255,255,.15);
-  background: transparent;
-  color: rgba(220,220,220,.7);
-  font-size: 18px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background .2s, color .2s, border-color .2s;
-}
-.portfolio-btn:hover {
-  background: rgba(255,255,255,.08);
-  color: var(--cream);
-  border-color: rgba(255,255,255,.3);
-}
-.portfolio-btn:disabled {
-  opacity: 0.25;
-  cursor: default;
-}
-.portfolio-dots {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 24px;
-}
-.portfolio-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: rgba(220,220,220,.2);
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  transition: background .2s, transform .2s;
-}
-.portfolio-dot.active {
-  background: var(--red);
-  transform: scale(1.3);
-}
-@media (max-width: 600px) {
-  .portfolio-slide { flex: 0 0 85%; }
-  .portfolio-btn { display: none; }
+  gap: 10px;
+  margin-top: 32px;
 }
 
 /* ── Footer ────────────────────────────────────────── */

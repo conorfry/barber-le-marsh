@@ -10,6 +10,7 @@ const PORT = process.env.PORT || 3000;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'barber2024';
 const DATA_DIR      = process.env.DATA_DIR || __dirname;
 const BOOKINGS_FILE = path.join(DATA_DIR, 'bookings.json');
+const CALENDAR_ICS_URL = process.env.CALENDAR_ICS_URL || '';
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -43,6 +44,76 @@ function toMins(t) {
 
 function fromMins(n) {
   return `${String(Math.floor(n / 60)).padStart(2, '0')}:${String(n % 60).padStart(2, '0')}`;
+}
+
+const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+// ── Google Calendar (week-availability widget) ──────────────────────────────
+
+function londonParts(date) {
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Europe/London', year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', hour12: false,
+    }).formatToParts(date).map(p => [p.type, p.value])
+  );
+  return { date: `${parts.year}-${parts.month}-${parts.day}`, minutes: toMins(`${parts.hour}:${parts.minute}`) };
+}
+
+// Parses a raw DTSTART/DTEND value into either an all-day date or a UK-local {date, minutes}.
+function parseICSDateTime(value) {
+  const m = value.match(/^(\d{4})(\d{2})(\d{2})(?:T(\d{2})(\d{2})(\d{2}))?(Z)?$/);
+  if (!m) return null;
+  const [, y, mo, d, h, mi, s, z] = m;
+  if (h === undefined) return { allDay: true, date: `${y}-${mo}-${d}` };
+  if (z) return { allDay: false, ...londonParts(new Date(Date.UTC(+y, mo - 1, +d, +h, +mi, +s))) };
+  // Floating/local value — the feed's X-WR-TIMEZONE is Europe/London, so treat as UK wall-clock directly.
+  return { allDay: false, date: `${y}-${mo}-${d}`, minutes: (+h) * 60 + (+mi) };
+}
+
+function parseICS(text) {
+  const unfolded = text.replace(/\r\n/g, '\n').replace(/\n[ \t]/g, '');
+  const events = [];
+  for (const block of unfolded.split('BEGIN:VEVENT').slice(1)) {
+    const body = block.split('END:VEVENT')[0];
+    const startLine = body.match(/^DTSTART[^:\n]*:(\S+)/m);
+    const endLine   = body.match(/^DTEND[^:\n]*:(\S+)/m);
+    if (!startLine) continue;
+    const start = parseICSDateTime(startLine[1]);
+    const end   = endLine ? parseICSDateTime(endLine[1]) : null;
+    if (start) events.push({ start, end });
+  }
+  return events;
+}
+
+// Reduces parsed events into { 'YYYY-MM-DD': [{start,end} in minutes-from-midnight] }.
+function eventsToBusyByDate(events) {
+  const busy = {};
+  for (const { start, end } of events) {
+    if (start.allDay) {
+      (busy[start.date] ??= []).push({ start: 0, end: 24 * 60 });
+      continue;
+    }
+    const endMinutes = end && !end.allDay && end.date === start.date ? end.minutes : start.minutes + 30;
+    (busy[start.date] ??= []).push({ start: start.minutes, end: Math.max(endMinutes, start.minutes + 1) });
+  }
+  return busy;
+}
+
+let calendarCache = { fetchedAt: 0, busyByDate: {} };
+const CALENDAR_CACHE_MS = 15 * 60 * 1000;
+
+async function getBusyByDate() {
+  if (!CALENDAR_ICS_URL) return {};
+  if (Date.now() - calendarCache.fetchedAt < CALENDAR_CACHE_MS) return calendarCache.busyByDate;
+  try {
+    const res = await fetch(CALENDAR_ICS_URL);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    calendarCache = { fetchedAt: Date.now(), busyByDate: eventsToBusyByDate(parseICS(await res.text())) };
+  } catch (err) {
+    console.error('Calendar fetch failed, using stale cache:', err.message);
+  }
+  return calendarCache.busyByDate;
 }
 
 function readBookings() {
@@ -237,6 +308,44 @@ app.get('/api/availability', (req, res) => {
   }
 
   res.json({ available: true, slots, hours });
+});
+
+app.get('/api/week-availability', async (_req, res) => {
+  const busyByDate = await getBusyByDate();
+  const today = londonParts(new Date()).date;
+  const minDuration = Math.min(...SERVICES.map(s => s.duration));
+
+  const days = [];
+  for (let i = 0; i < 7; i++) {
+    const [y, mo, d] = today.split('-').map(Number);
+    const anchor = new Date(Date.UTC(y, mo - 1, d, 12)); // noon UTC avoids DST edge cases
+    anchor.setUTCDate(anchor.getUTCDate() + i);
+    const date = `${anchor.getUTCFullYear()}-${String(anchor.getUTCMonth() + 1).padStart(2, '0')}-${String(anchor.getUTCDate()).padStart(2, '0')}`;
+    const weekday = anchor.getUTCDay();
+    const hours = OPENING_HOURS[weekday];
+
+    if (!hours) {
+      days.push({ date, weekday: DAY_NAMES[weekday], type: 'closed' });
+      continue;
+    }
+    if (!BOOKABLE_DAYS.includes(weekday)) {
+      days.push({ date, weekday: DAY_NAMES[weekday], type: 'walkin', hours });
+      continue;
+    }
+
+    const busy = busyByDate[date] || [];
+    const openMin = toMins(hours.open), closeMin = toMins(hours.close);
+    let free = 0, total = 0;
+    for (let t = openMin; t + minDuration <= closeMin; t += 30) {
+      total++;
+      const end = t + minDuration;
+      if (!busy.some(b => t < b.end && end > b.start)) free++;
+    }
+    const status = free === 0 ? 'full' : free <= 2 ? 'limited' : 'open';
+    days.push({ date, weekday: DAY_NAMES[weekday], type: 'bookable', hours, status, freeSlots: free, totalSlots: total });
+  }
+
+  res.json({ days, live: !!CALENDAR_ICS_URL });
 });
 
 app.post('/api/bookings', (req, res) => {
