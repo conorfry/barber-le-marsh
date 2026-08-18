@@ -287,7 +287,7 @@
     <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border);font-size:13px;color:var(--muted);line-height:1.7">
       <p>Walk-in queue opens at <strong style="color:var(--text)">9:00 am</strong></p>
       <p>Doors open at <strong style="color:var(--text)">10:00 am</strong></p>
-      <p>Open <strong style="color:var(--text)">Tuesday – Sunday</strong>, closed Monday</p>
+      <p>Open <strong style="color:var(--text)">Tuesday – Saturday</strong>, closed Sunday &amp; Monday</p>
       <p>Last walk-in accepted by <strong style="color:var(--text)">5:30 pm</strong></p>
     </div>
   </div>
@@ -359,7 +359,7 @@
     const mins = now.getHours() * 60 + now.getMinutes();
     const openMins  = 10 * 60;
     const closeMins = 17 * 60 + 30; // 17:30 all open days
-    const isOpenDay = day >= 2 && day <= 6 || day === 0; // Tue–Sun, closed Mon
+    const isOpenDay = day >= 2 && day <= 6; // Tue–Sat, closed Sun & Mon
     return isOpenDay && mins >= openMins && mins < closeMins;
   }
 
@@ -437,15 +437,19 @@
       return;
     }
 
-    // Block joins after 17:30 or on Mondays
+    // Block joins after 17:30 or on Sundays/Mondays
     const now = new Date();
     const day = now.getDay();
+    if (day === 0) {
+      showError('Sorry, we\'re closed on Sundays. We open again Tuesday at 9:00 am.');
+      return;
+    }
     if (day === 1) {
       showError('Sorry, we\'re closed on Mondays. We open again Tuesday at 9:00 am.');
       return;
     }
     if (now.getHours() > 17 || (now.getHours() === 17 && now.getMinutes() >= 30)) {
-      const nextOpen = day === 0 ? 'Tuesday' : 'tomorrow';
+      const nextOpen = day === 6 ? 'Tuesday' : 'tomorrow';
       showError(`Sorry, the queue is now closed for today. We open again ${nextOpen} at 9:00 am.`);
       return;
     }

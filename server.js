@@ -26,12 +26,15 @@ const SERVICES = [
 
 // Keyed by JS day-of-week (0=Sun). Days absent = closed.
 const OPENING_HOURS = {
-  0: { open: '10:00', close: '14:00' }, // Sunday
+  2: { open: '10:00', close: '18:00' }, // Tuesday
   3: { open: '10:00', close: '18:00' }, // Wednesday
   4: { open: '12:00', close: '20:00' }, // Thursday
   5: { open: '10:00', close: '18:00' }, // Friday
-  6: { open: '10:00', close: '18:00' }, // Saturday
+  6: { open: '10:00', close: '15:00' }, // Saturday
 };
+
+// Online booking is only open on these days for now (subset of OPENING_HOURS).
+const BOOKABLE_DAYS = [5, 6]; // Friday, Saturday
 
 function toMins(t) {
   const [h, m] = t.split(':').map(Number);
@@ -214,7 +217,7 @@ app.get('/api/availability', (req, res) => {
 
   const day = new Date(date + 'T12:00:00').getDay();
   const hours = OPENING_HOURS[day];
-  if (!hours) return res.json({ available: false, slots: [] });
+  if (!hours || !BOOKABLE_DAYS.includes(day)) return res.json({ available: false, slots: [] });
 
   const service = SERVICES.find(s => s.id === serviceId);
   if (!service) return res.status(400).json({ error: 'Invalid service' });
@@ -246,6 +249,7 @@ app.post('/api/bookings', (req, res) => {
 
   const day = new Date(date + 'T12:00:00').getDay();
   if (!OPENING_HOURS[day]) return res.status(400).json({ error: 'Shop is closed on this day' });
+  if (!BOOKABLE_DAYS.includes(day)) return res.status(400).json({ error: 'Online booking is only available on Fridays and Saturdays for now' });
 
   const bookings = readBookings();
   const slotStart = toMins(time);
