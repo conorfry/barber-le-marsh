@@ -1177,6 +1177,12 @@ a   { color: inherit; text-decoration: none; }
   .section-inner--row { grid-template-columns: 1fr; }
   .about-ornament { display: none; }
   .hours-grid { grid-template-columns: 1fr; gap: 48px; }
+  /* Single column now — drop the desktop height-matching hack (flex/percentage
+     table height), which Safari mishandles and was pushing .hours-note up
+     into the Find Us block below it. */
+  .hours-table { height: auto; flex: none; }
+  .hours-table tbody { height: auto; }
+  .hours-table tr { height: auto; }
 }
 @media (max-width: 600px) {
   .nav-links { display: none; }
