@@ -44,13 +44,17 @@ a   { color: inherit; text-decoration: none; }
   top: 0; left: 0; right: 0;
   z-index: 100;
   height: var(--nav-h);
-  background: linear-gradient(to bottom, rgba(0,0,0,.55) 0%, rgba(0,0,0,.55) 75%, rgba(0,0,0,0) 100%);
-  border-bottom: 1px solid transparent;
-  transition: background .4s ease, border-color .4s ease;
+  background: linear-gradient(to bottom, rgba(0,0,0,.5) 0%, rgba(0,0,0,.32) 100%);
+  backdrop-filter: blur(8px) saturate(140%);
+  -webkit-backdrop-filter: blur(8px) saturate(140%);
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  box-shadow: 0 1px 12px rgba(0,0,0,.08);
+  transition: background .4s ease, border-color .4s ease, box-shadow .4s ease;
 }
 .nav.scrolled {
   background: var(--charcoal);
   border-bottom-color: rgba(255,255,255,.06);
+  box-shadow: 0 4px 20px rgba(0,0,0,.2);
 }
 .nav-inner {
   max-width: 1100px;
@@ -107,6 +111,15 @@ a   { color: inherit; text-decoration: none; }
   transition: color .2s;
 }
 .nav-links a:hover { color: var(--cream); }
+.nav-cta {
+  color: var(--cream) !important;
+  background: transparent;
+  border: 1px solid rgba(220,220,220,.35);
+  padding: 8px 16px;
+  border-radius: 999px;
+  transition: border-color .2s, background .2s;
+}
+.nav-cta:hover { border-color: rgba(220,220,220,.7); background: rgba(255,255,255,.06); }
 .nav-link-disabled {
   color: rgba(220,220,220,.6);
   font-size: 12px;
@@ -136,12 +149,20 @@ a   { color: inherit; text-decoration: none; }
 .nav-burger {
   display: none;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
   gap: 5px;
+  width: 40px;
+  height: 40px;
   background: none;
   border: none;
+  border-radius: 50%;
   cursor: pointer;
   padding: 4px;
+  transition: background .2s;
 }
+.nav-burger:hover,
+.nav-burger:focus-visible { background: rgba(255,255,255,.1); }
 .nav-burger span {
   display: block;
   width: 22px; height: 2px;
@@ -161,9 +182,14 @@ a   { color: inherit; text-decoration: none; }
   flex-direction: column;
   align-items: flex-start;
   padding: 24px 28px 32px;
-  gap: 24px;
+  gap: 22px;
   border-bottom: 1px solid rgba(255,255,255,.08);
-  box-shadow: 0 8px 32px rgba(0,0,0,.4);
+  box-shadow: 0 12px 32px rgba(0,0,0,.35);
+}
+.nav-links.is-open a,
+.nav-links.is-open .nav-link-disabled { font-size: 13px; }
+.nav-links.is-open .nav-cta {
+  margin-top: 4px;
 }
 
 /* ── Buttons ───────────────────────────────────────── */
