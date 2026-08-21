@@ -665,16 +665,12 @@ a   { color: inherit; text-decoration: none; }
 .week-card--full     .week-card-badge { background: var(--cream-alt); color: var(--warm-grey); }
 .week-card--walkin   .week-card-badge { background: var(--red-lt); color: var(--red-dk); }
 .week-card--closed   { opacity: .5; }
-/* "Today" — highlighted like Fresha's selected date */
+/* "Today" — outlined like Fresha's selected date */
 .week-card--today {
-  background: var(--fresha-accent);
-  box-shadow: 0 4px 14px rgba(91,79,229,.35);
+  background: #fff;
+  border: 2px solid var(--fresha-accent);
+  padding: 12px 4px 10px;
 }
-.week-card--today .week-card-weekday,
-.week-card--today .week-card-daynum,
-.week-card--today .week-card-month { color: #fff; }
-.week-card--today .week-card-hours { color: rgba(255,255,255,.75); }
-.week-card--today .week-card-badge { background: rgba(255,255,255,.2); color: #fff; }
 .week-legend {
   display: flex;
   flex-wrap: wrap;
