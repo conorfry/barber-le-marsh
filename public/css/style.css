@@ -690,6 +690,12 @@ a   { color: inherit; text-decoration: none; }
 }
 
 /* ── Reviews ───────────────────────────────────────── */
+.reviews-heading-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
 .reviews-grid {
   display: flex;
   gap: 20px;

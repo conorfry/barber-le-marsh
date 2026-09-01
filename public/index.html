@@ -219,8 +219,18 @@
 <section class="section section--alt" id="reviews">
   <div class="section-inner">
     <p class="section-label">What People Say</p>
-    <h2 class="section-heading">Reviews</h2>
-    <div class="reviews-grid">
+    <div class="reviews-heading-row">
+      <h2 class="section-heading">Reviews</h2>
+      <div class="week-chevrons">
+        <button class="week-chevron" id="reviews-prev" aria-label="Previous reviews" disabled>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button class="week-chevron" id="reviews-next" aria-label="Next reviews">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="reviews-grid" id="reviews-grid">
       <div class="review-card">
         <div class="review-stars">★★★★★</div>
         <p class="review-text">"Best barber around. Top class attention to detail."</p>
@@ -452,6 +462,32 @@
     }, { passive: true });
 
     loadWeek(0);
+  })();
+
+  // Reviews carousel — scroll one card at a time via chevrons
+  (function () {
+    const grid    = document.getElementById('reviews-grid');
+    const prevBtn = document.getElementById('reviews-prev');
+    const nextBtn = document.getElementById('reviews-next');
+    if (!grid || !prevBtn || !nextBtn) return;
+
+    function cardStep() {
+      const card = grid.querySelector('.review-card');
+      const gap  = parseFloat(getComputedStyle(grid).gap) || 20;
+      return card ? card.offsetWidth + gap : 360;
+    }
+
+    function updateButtons() {
+      const maxScroll = grid.scrollWidth - grid.clientWidth - 1;
+      prevBtn.disabled = grid.scrollLeft <= 0;
+      nextBtn.disabled = grid.scrollLeft >= maxScroll;
+    }
+
+    prevBtn.addEventListener('click', () => grid.scrollBy({ left: -cardStep(), behavior: 'smooth' }));
+    nextBtn.addEventListener('click', () => grid.scrollBy({ left: cardStep(), behavior: 'smooth' }));
+    grid.addEventListener('scroll', updateButtons, { passive: true });
+    window.addEventListener('resize', updateButtons);
+    updateButtons();
   })();
 
   // Load services into homepage menu
