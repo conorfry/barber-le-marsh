@@ -7,6 +7,7 @@
   --cream:      #F2F2F2;
   --cream-alt:  #E5E5E5;
   --cream-dark: #DADADA;
+  --egyptian-cotton: #F2ECDD;
   --charcoal:   #18171A;
   --charcoal-2: #252329;
   --red:        #C12B2B;
@@ -224,6 +225,7 @@ a   { color: inherit; text-decoration: none; }
 }
 .btn-ghost-light:hover { border-color: rgba(220,220,220,.7); }
 .btn-hero {
+  display: none;
   font-size: 16px;
   padding: 22px 56px;
   border-radius: 999px;
@@ -763,10 +765,10 @@ a   { color: inherit; text-decoration: none; }
 
 /* ── Footer ────────────────────────────────────────── */
 .footer {
-  background: var(--charcoal);
+  background: var(--egyptian-cotton);
   padding: 64px 24px 48px;
   text-align: center;
-  border-top: 1px solid rgba(255,255,255,.05);
+  border-top: 1px solid rgba(24,23,26,.08);
 }
 .footer-inner { max-width: 480px; margin: 0 auto; }
 .footer-logo {
@@ -780,6 +782,7 @@ a   { color: inherit; text-decoration: none; }
   height: 56px;
   margin: 0 auto 18px;
   opacity: .95;
+  filter: invert(1);
 }
 .footer-brand {
   font-family: var(--logo);
@@ -787,13 +790,13 @@ a   { color: inherit; text-decoration: none; }
   font-weight: 600;
   letter-spacing: .22em;
   text-transform: uppercase;
-  color: var(--cream);
+  color: var(--charcoal);
 }
 .footer-est {
   font-size: 11px;
   letter-spacing: .18em;
   text-transform: uppercase;
-  color: rgba(220,220,220,.45);
+  color: rgba(24,23,26,.5);
   margin-top: 6px;
 }
 .footer-dashboard {
@@ -802,14 +805,14 @@ a   { color: inherit; text-decoration: none; }
   font-size: 10px;
   letter-spacing: .12em;
   text-transform: uppercase;
-  color: rgba(220,220,220,.2);
+  color: rgba(24,23,26,.3);
   text-decoration: none;
   transition: color .2s;
 }
-.footer-dashboard:hover { color: rgba(220,220,220,.5); }
-.footer-links { font-size: 13px; color: rgba(220,220,220,.28); }
+.footer-dashboard:hover { color: rgba(24,23,26,.7); }
+.footer-links { font-size: 13px; color: rgba(24,23,26,.35); }
 .footer-links a { transition: color .2s; }
-.footer-links a:hover { color: var(--cream); }
+.footer-links a:hover { color: var(--charcoal); }
 .footer-sep  { margin: 0 10px; }
 
 /* ── Booking page wrapper ──────────────────────────── */
@@ -1219,6 +1222,7 @@ a   { color: inherit; text-decoration: none; }
   .nav-burger { display: flex; }
   .nav-inner { justify-content: space-between; }
   .nav-logo-text { font-size: 12px; letter-spacing: .14em; }
+  .btn-hero { display: inline-block; }
   .shop-grid { grid-template-columns: repeat(2, 1fr); }
   .section { padding: 72px 20px; }
 }
