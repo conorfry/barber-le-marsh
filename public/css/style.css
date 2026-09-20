@@ -19,6 +19,7 @@
   --serif:      'DM Sans', system-ui, sans-serif;
   --sans:       'DM Sans', system-ui, sans-serif;
   --script:     'Dancing Script', cursive;
+  --logo:       'Outfit', var(--sans);
   --nav-h:      72px;
   --radius:     6px;
   --radius-lg:  12px;
@@ -75,27 +76,17 @@ a   { color: inherit; text-decoration: none; }
 .nav-logo {
   display: block;
   flex-shrink: 0;
-  height: 32px;
-  width: calc(32px * 403 / 300);
 }
-.nav-logo-imgs {
+.nav-logo-text {
   display: block;
-  position: relative;
-  width: 100%;
-  height: 100%;
+  font-family: var(--logo);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  color: var(--cream);
+  white-space: nowrap;
 }
-.nav-logo-imgs img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  opacity: 0;
-  transition: opacity .4s ease;
-}
-.nav-logo-imgs .nav-logo-light { opacity: 1; }
-.nav.scrolled .nav-logo-imgs .nav-logo-light { opacity: 0; }
-.nav.scrolled .nav-logo-imgs .nav-logo-dark  { opacity: 1; }
 .nav-links {
   display: flex;
   align-items: center;
@@ -412,8 +403,12 @@ a   { color: inherit; text-decoration: none; }
   pointer-events: none;
 }
 .gift-card-logo {
-  height: 44px;
-  width: auto;
+  font-family: var(--logo);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--cream);
   position: relative;
   z-index: 1;
 }
@@ -1200,6 +1195,7 @@ a   { color: inherit; text-decoration: none; }
   .nav-links { display: none; }
   .nav-burger { display: flex; }
   .nav-inner { justify-content: space-between; }
+  .nav-logo-text { font-size: 12px; letter-spacing: .14em; }
   .shop-grid { grid-template-columns: repeat(2, 1fr); }
   .section { padding: 72px 20px; }
 }
