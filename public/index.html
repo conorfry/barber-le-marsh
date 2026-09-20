@@ -42,7 +42,7 @@ src="https://www.facebook.com/tr?id=1310190450505515&ev=PageView&noscript=1"
     "@context": "https://schema.org",
     "@type": "HairSalon",
     "name": "Barber le Marsh",
-    "description": "A modern British barbershop in Burgh le Marsh offering style cuts, skin fades, short back & sides, beard trims, kids cuts and bundle deals. Walk-ins welcome.",
+    "description": "A modern British barbershop in Burgh le Marsh offering style cuts, skin fades, short back & sides, beard trims, kids cuts and bundle deals. Book online today.",
     "address": {
       "@type": "PostalAddress",
       "streetAddress": "20 High Street",
@@ -188,7 +188,7 @@ src="https://www.facebook.com/tr?id=1310190450505515&ev=PageView&noscript=1"
   <div class="section-inner">
     <p class="section-label">This Week</p>
     <h2 class="section-heading">Availability at a Glance</h2>
-    <p class="section-sub">Book online Friday &amp; Saturday — walk-ins welcome Tuesday to Saturday.</p>
+    <p class="section-sub">Check this week's availability and book your slot online.</p>
 
     <div class="week-select-row">
       <p class="week-select-label" id="week-range">This Week</p>
@@ -208,7 +208,6 @@ src="https://www.facebook.com/tr?id=1310190450505515&ev=PageView&noscript=1"
       <span class="week-legend-item"><span class="week-dot week-dot--open"></span>Online booking open</span>
       <span class="week-legend-item"><span class="week-dot week-dot--limited"></span>Filling up</span>
       <span class="week-legend-item"><span class="week-dot week-dot--full"></span>Fully booked</span>
-      <span class="week-legend-item"><span class="week-dot week-dot--walkin"></span>Walk-in only</span>
     </div>
   </div>
 </section>
@@ -219,7 +218,7 @@ src="https://www.facebook.com/tr?id=1310190450505515&ev=PageView&noscript=1"
   <div class="section-inner">
     <p class="section-label">The Menu</p>
     <h2 class="section-heading">Our Services</h2>
-    <p class="section-sub">Walk-ins welcome — subject to availability</p>
+    <p class="section-sub">Browse the full menu and book online in under a minute</p>
     <div class="services-menu" id="services-menu">
       <p class="loading" style="border-top:1px solid var(--border);padding:24px 0">Loading…</p>
     </div>
@@ -365,7 +364,7 @@ src="https://www.facebook.com/tr?id=1310190450505515&ev=PageView&noscript=1"
             <tr><td>Sunday</td><td>Closed</td></tr>
           </tbody>
         </table>
-        <p class="hours-note">Online booking is currently available Friday &amp; Saturday only — walk-ins welcome anytime we're open.</p>
+        <p class="hours-note">Book your appointment online — quick, easy, and the best way to guarantee your slot.</p>
       </div>
       <div>
         <p class="section-label">Find Us</p>
@@ -406,7 +405,7 @@ src="https://www.facebook.com/tr?id=1310190450505515&ev=PageView&noscript=1"
       open:    { label: 'Book online',  cls: 'open' },
       limited: { label: 'Filling up',   cls: 'limited' },
       full:    { label: 'Fully booked', cls: 'full' },
-      walkin:  { label: 'Walk-in only', cls: 'walkin' },
+      walkin:  { label: '', cls: 'walkin' },
       closed:  { label: 'Closed',       cls: 'closed' },
     };
     const fmtDate = d => new Date(d + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
@@ -427,7 +426,7 @@ src="https://www.facebook.com/tr?id=1310190450505515&ev=PageView&noscript=1"
         const { label, cls } = STATUS[key];
         const clickable = d.type === 'bookable' && d.status !== 'full';
         const hoursText = d.type === 'closed' ? 'Closed' : `${d.hours.open}–${d.hours.close}`;
-        const badge = d.type === 'closed' ? ''
+        const badge = (d.type === 'closed' || d.type === 'walkin') ? ''
           : clickable
             ? `<a href="${BOOK_URL}" target="_blank" rel="noopener" class="week-card-badge week-card-badge--link">${label}</a>`
             : `<span class="week-card-badge">${label}</span>`;
