@@ -256,6 +256,9 @@ a   { color: inherit; text-decoration: none; }
   text-align: center;
   position: relative;
 }
+@media (max-width: 768px) {
+  .hero { background-image: url('/hero-sm.jpg'); }
+}
 .hero::before {
   content: '';
   position: absolute;
