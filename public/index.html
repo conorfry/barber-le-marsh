@@ -193,6 +193,26 @@ src="https://www.facebook.com/tr?id=1310190450505515&ev=PageView&noscript=1"
     <div class="elfsight-app-fb4ebcb5-a0a0-43e1-87e0-f5185b62542e" data-elfsight-app-lazy></div>
   </div>
 </section>
+<script>
+  // Hide the Elfsight widget's own "What Our Customers Say" title (it renders inside a shadow root)
+  (function () {
+    const host = document.querySelector('.elfsight-app-fb4ebcb5-a0a0-43e1-87e0-f5185b62542e');
+    if (!host) return;
+    const hide = () => {
+      host.querySelectorAll('*').forEach(el => {
+        const root = el.shadowRoot;
+        if (root && !root.querySelector('#blm-hide-title')) {
+          const style = document.createElement('style');
+          style.id = 'blm-hide-title';
+          style.textContent = '.es-widget-title-container { display: none !important; }';
+          root.appendChild(style);
+        }
+      });
+    };
+    new MutationObserver(hide).observe(host, { childList: true, subtree: true });
+    hide();
+  })();
+</script>
 
 
 <!-- Footer -->
